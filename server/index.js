@@ -1,10 +1,17 @@
+const dotnet = require('dotenv')
 const express = require('express')
 const http = require('http')
 const isIP = require('net').isIP
 const ip2location = require('ip2location-nodejs')
 
+dotnet.config({path: 'config.env'})
+
+const HOST = process.env.HOST || '127.0.0.1'
+const PORT = process.env.PORT || 8000
+const DB = process.env.DB || 'IP2LOCATION-LITE-DB5.IPV6.BIN'
+
 // initializing ip2location lookup system using binary file
-ip2location.IP2Location_init('../IP2LOCATION-LITE-DB5.IPV6.BIN')
+ip2location.IP2Location_init(DB)
 
 const app = express()
 
@@ -35,5 +42,5 @@ app.get('/ip/:addr', (req, res) => {
 })
 
 // starting simple http server
-http.createServer(app).listen(8000, '0.0.0.0',
-    _ => { console.log('Listening on http://0.0.0.0:8000\n') })
+http.createServer(app).listen(PORT, HOST,
+    _ => { console.log(`Listening on http://${HOST}:${PORT}\n`) })
