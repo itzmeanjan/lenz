@@ -1,0 +1,22 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Express application for facilitating Location query by IP address",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itzmeanjan/magneto.git"
+  },
+  "author": "Anjan Roy <anjanroy@yandex.com>",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/itzmeanjan/magneto/issues"
+  },
+  "homepage": "https://github.com/itzmeanjan/magneto#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
