@@ -1,6 +1,6 @@
 ## magneto-server
 
-Express Application for facilitating location lookup by IPv_{4,6}_ address. 
+Express Application for facilitating location lookup by IPv _{4,6}_ address. 
 
 ## setup
 
@@ -26,7 +26,7 @@ node index.js
 
 ## usage
 
-Sending a GET request at `/ip/{addr}`, where **addr** is a valid IPv_{4,6}_ address, returns JSON response like below.
+Sending a GET request at `/ip/{addr}`, where **addr** is a valid IPv _{4,6}_ address, returns JSON response like below.
 
 ```json
 {
