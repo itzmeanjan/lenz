@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/itzmeanjan/magneto#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "ip2location-nodejs": "^8.3.0"
   }
 }

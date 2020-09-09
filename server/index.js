@@ -6,7 +6,7 @@ const app = express()
 
 app.get('/ip/:addr', (req, res) => {
     if (isIP(req.params.addr) === 0) {
-        return res.status(404).json({ msg: 'Bad Input' })
+        return res.status(400).json({ msg: 'Bad Input' })
     }
 
     return res.status(200).json({ addr: req.params.addr })
