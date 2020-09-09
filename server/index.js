@@ -11,7 +11,7 @@ app.get('/ip/:addr', (req, res) => {
     if (isIP(req.params.addr) === 0) {
         return res.status(400).contentType('application/json').send(JSON.stringify({
             msg: 'Bad Input'
-        }, space = '\t'))
+        }, null, '\t'))
     }
 
     return res.status(200).contentType('application/json').send(JSON.stringify({
@@ -20,7 +20,7 @@ app.get('/ip/:addr', (req, res) => {
         lat: ip2location.IP2Location_get_latitude(req.params.addr),
         region: ip2location.IP2Location_get_region(req.params.addr),
         country: ip2location.IP2Location_get_country_long(req.params.addr)
-    }, space = '\t'))
+    }, null, '\t'))
 })
 
 http.createServer(app).listen(8000, '0.0.0.0',
