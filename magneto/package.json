@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/itzmeanjan/magneto#readme",
   "dependencies": {
+    "axios": "^0.20.0",
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.20",
     "dotnet": "^1.1.4",
