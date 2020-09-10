@@ -1,15 +1,24 @@
 {
-  "name": "server",
+  "name": "magneto",
   "version": "1.0.0",
-  "description": "Express application for facilitating Location query by IP address",
+  "description": "Peer Visualiser using Torrent 🧲 Link",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/itzmeanjan/magneto.git"
   },
+  "keywords": [
+    "magneto",
+    "torrent",
+    "magnet",
+    "link",
+    "dataviz",
+    "peer"
+  ],
   "author": "Anjan Roy <anjanroy@yandex.com>",
   "license": "CC0-1.0",
   "bugs": {
@@ -17,8 +26,10 @@
   },
   "homepage": "https://github.com/itzmeanjan/magneto#readme",
   "dependencies": {
+    "axios": "^0.20.0",
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.8.20",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
     "ip2location-nodejs": "^8.3.0"
   }
 }
