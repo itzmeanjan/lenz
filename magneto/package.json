@@ -27,6 +27,8 @@
   "homepage": "https://github.com/itzmeanjan/magneto#readme",
   "dependencies": {
     "blessed": "^0.1.81",
-    "blessed-contrib": "^4.8.20"
+    "blessed-contrib": "^4.8.20",
+    "dotnet": "^1.1.4",
+    "ip2location-nodejs": "^8.3.0"
   }
 }
