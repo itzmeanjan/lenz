@@ -1,9 +1,9 @@
 const axios = require('axios')
 const endpoint = 'https://api.ipify.org?format=json'
 
-const getMyIP = _ => {
-    return axios.get(endpoint).then(resp => resp.ip).catch(err => null)
-}
+const getMyIP = _ => new Promise((resolve, reject) => {
+    axios.get(endpoint).then(resp => resolve(resp.data.ip)).catch(reject)
+})
 
 module.exports = {
     getMyIP
