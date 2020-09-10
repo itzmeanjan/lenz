@@ -1,4 +1,5 @@
 const DHT = require('bittorrent-dht')
+DHT.dgram = require('chrome-dgram')
 const magnetParser = require('magnet-uri')
 
 const map = L.map('map', {
@@ -14,9 +15,9 @@ map.whenReady(_ => {
     const parsed = magnetParser(uri)
 
     const dht = new DHT()
-    dht.listen(20000, _ => {console.log('Listening ...')})
+    dht.listen(9000, _ => {console.log('Listening ...')})
 
-    dht.on('peer', (peer, infoHash, from) => {
+    dht.on('peer', (peer, _, from) => {
         console.log(`${peer.host}:${peer.port} <= ${from.address}:${from.port}`)
     })
 

@@ -4,7 +4,7 @@
   "description": "Front-end for magneto 🧲 application - Torrent Magnet Link Peer Visualiser",
   "main": "index.js",
   "scripts": {
-    "build": "npx browserify index.js -o output.js",
+    "build": "browserify index.js -o output.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,6 +28,7 @@
   "dependencies": {
     "bittorrent-dht": "^10.0.0",
     "browserify": "^16.5.2",
+    "chrome-dgram": "^3.0.5",
     "magnet-uri": "^5.3.0"
   }
 }
