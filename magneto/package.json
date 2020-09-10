@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Peer Visualiser using Torrent 🧲 Link",
   "main": "index.js",
+  "bin": {
+    "magneto": "./index.js"
+  },
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
