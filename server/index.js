@@ -1,14 +1,15 @@
 const dotnet = require('dotenv')
+const { isAbsolute, join, resolve } = require('path')
 const express = require('express')
 const http = require('http')
 const isIP = require('net').isIP
 const ip2location = require('ip2location-nodejs')
 
-dotnet.config({path: 'config.env'})
+dotnet.config({ path: 'config.env' })
 
 const HOST = process.env.HOST || '127.0.0.1'
 const PORT = process.env.PORT || 8000
-const DB = process.env.DB || 'IP2LOCATION-LITE-DB5.IPV6.BIN'
+const DB = isAbsolute(process.env.DB || 'IP2LOCATION-LITE-DB5.IPV6.BIN') ? process.env.DB || 'IP2LOCATION-LITE-DB5.IPV6.BIN' : resolve(__dirname, process.env.DB || 'IP2LOCATION-LITE-DB5.IPV6.BIN')
 
 // initializing ip2location lookup system using binary file
 ip2location.IP2Location_init(DB)
@@ -17,7 +18,7 @@ const app = express()
 
 // logging time of request & path requested
 const logger = (req, _, next) => {
-    console.log(`${req.path} | ${new Date().getTime()/1000}`)
+    console.log(`${req.path} | ${new Date().getTime() / 1000}`)
     next()
 }
 
