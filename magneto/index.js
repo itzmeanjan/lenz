@@ -13,7 +13,20 @@ map.whenReady(_ => {
     const uri = 'magnet:?xt=urn:btih:e3811b9539cacff680e418124272177c47477157'
     const parsed = magnetParser(uri)
 
-    console.log(parsed.infoHash)
+    const dht = new DHT()
+    dht.listen(20000, _ => {console.log('Listening ...')})
+
+    dht.on('peer', (peer, infoHash, from) => {
+        console.log(`${peer.host}:${peer.port} <= ${from.address}:${from.port}`)
+    })
+
+    dht.lookup(parsed.infoHash, (err, count) => {
+        if(err) {
+            console.log(err)
+        }
+
+        console.log(`Peers: ${count}`)
+    })
 })
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
