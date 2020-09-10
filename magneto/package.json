@@ -1,10 +1,10 @@
 {
   "name": "magneto",
   "version": "1.0.0",
-  "description": "Front-end for magneto 🧲 application - Torrent Magnet Link Peer Visualiser",
+  "description": "Peer Visualiser using Torrent 🧲 Link",
   "main": "index.js",
   "scripts": {
-    "build": "browserify index.js > output.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
