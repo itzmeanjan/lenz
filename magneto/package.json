@@ -23,5 +23,9 @@
   "bugs": {
     "url": "https://github.com/itzmeanjan/magneto/issues"
   },
-  "homepage": "https://github.com/itzmeanjan/magneto#readme"
+  "homepage": "https://github.com/itzmeanjan/magneto#readme",
+  "dependencies": {
+    "bittorrent-dht": "^10.0.0",
+    "magnet-uri": "^5.3.0"
+  }
 }
