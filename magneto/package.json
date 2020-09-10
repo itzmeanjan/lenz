@@ -25,5 +25,8 @@
     "url": "https://github.com/itzmeanjan/magneto/issues"
   },
   "homepage": "https://github.com/itzmeanjan/magneto#readme",
-  "dependencies": {}
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.8.20"
+  }
 }
