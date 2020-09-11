@@ -44,8 +44,10 @@ const addMarkerAndRender = (lon, lat, color, char) => {
 let on = true;
 // enabling flashing effect
 const enableFlashEffect = _ => {
-    if(on) {
-        markers.forEach(map.addMarker)
+    if (on) {
+        markers.forEach(v => {
+            map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
+        })
     } else {
         map.clearMarkers()
     }
