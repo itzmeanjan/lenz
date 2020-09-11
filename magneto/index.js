@@ -9,7 +9,6 @@ require('colors')
 
 const { getMyIP } = require('./ip')
 const { lookup } = require('./locate')
-const { parse } = require('yargs')
 
 // validates looked up ip address info, because in case of
 // private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`

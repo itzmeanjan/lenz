@@ -1,8 +1,11 @@
 const dotnet = require('dotenv')
 dotnet.config({ path: 'config.env' })
 
+const {resolve} = require('path')
+
 const ip2location = require('ip2location-nodejs')
-ip2location.IP2Location_init(process.env.DB) // initializing database
+// initializing database
+ip2location.IP2Location_init(resolve(__dirname, process.env.DB))
 
 const { isIP } = require('net')
 
