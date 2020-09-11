@@ -14,11 +14,14 @@ const { lookup } = require('./locate')
 // private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`
 const validateLookup = data => !(data.lon === 0 && data.lat === 0 && data.region === '-' && data.country === '-')
 
-// taking valid magnet link as input from user
-const options = yargs
-    .usage("Usage: -m <magnet>")
-    .option("m", { alias: "magnet", describe: "Torrent 🧲 Link", type: "string", demandOption: true })
-    .argv;
+yargs.scriptName('magneto'.green)
+.usage('Usage: magneto <command> <params>'.bgMagenta)
+.command('lookup <magnet> <db>', 'Look up peers by torrent infohash', _y => {
+    _y.positional('magnet', { describe: 'torrent 🧲 link', type: 'string' })
+        .positional('db', { describe: 'ip2location db5 database', type: 'string' })
+}, argv => {
+    console.log(argv)
+}).demandCommand().help().wrap(72).argv
 
 // if gets parsed properly & `infoHash` of torrent can
 // be found, then we're good to go, otherwise, we'll exit
@@ -84,7 +87,7 @@ getMyIP().then(ip => {
         if (validateLookup(resp)) {
             // caching peer info
             markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-            
+
             // adding peer location in map
             addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
         }
