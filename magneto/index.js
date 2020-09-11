@@ -39,11 +39,17 @@ const addMarkerAndRender = (lon, lat, color, char) => {
     screen.render()
 }
 
+// markers to be drawn on screen cache
+const markers = []
+
 // obtaining ip address of this machine, by sending query to
 // 'https://api.ipify.org?format=json'
 getMyIP().then(ip => {
     let resp = lookup(ip)
     if (validateLookup(resp)) {
+        // cached host machine IP
+        markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
+
         // adding this machine's location onto map
         addMarkerAndRender(resp.lon, resp.lat, 'red', 'X')
     }
@@ -58,9 +64,13 @@ getMyIP().then(ip => {
     dht.on('peer', (peer, infoHash, from) => {
         // looking up peer location
         let resp = lookup(peer.host)
+        if (validateLookup(resp)) {
+            // caching peer info
+            markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
 
-        // adding peer location in map
-        addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+            // adding peer location in map
+            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+        }
     })
     // requesting dht to lookup use provided magnet link's infoHash
     dht.lookup(parsed.infoHash)
