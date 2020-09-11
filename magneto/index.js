@@ -39,6 +39,21 @@ const addMarkerAndRender = (lon, lat, color, char) => {
     screen.render()
 }
 
+// state of map, when true, is rendered with data
+// when false, canvas is cleared
+let on = true;
+// enabling flashing effect
+const enableFlashEffect = _ => {
+    if(on) {
+        markers.forEach(map.addMarker)
+    } else {
+        map.clearMarkers()
+    }
+
+    screen.render()
+    on = !on
+}
+
 // markers to be drawn on screen cache
 const markers = []
 
@@ -74,25 +89,10 @@ getMyIP().then(ip => {
     })
     // requesting dht to lookup use provided magnet link's infoHash
     dht.lookup(parsed.infoHash)
+    // flash every .5 seconds
+    setInterval(enableFlashEffect, 500)
 })
 
 // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
 screen.key(['escape', 'q', 'C-c'], (ch, key) => process.exit(0))
 screen.render()
-
-// state of map, when true, is rendered with data
-// when false, canvas is cleared
-let on = true;
-// enabling flashing effect
-const enableFlashEffect = _ => {
-    if(on) {
-        markers.forEach(map.addMarker)
-    } else {
-        map.clearMarkers()
-    }
-
-    screen.render()
-    on = !on
-}
-
-setInterval(enableFlashEffect, 500)
