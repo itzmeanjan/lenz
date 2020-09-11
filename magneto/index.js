@@ -9,6 +9,7 @@ require('colors')
 
 const { getMyIP } = require('./ip')
 const { lookup } = require('./locate')
+const { parse } = require('yargs')
 
 // validates looked up ip address info, because in case of
 // private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`
@@ -84,14 +85,14 @@ getMyIP().then(ip => {
         if (validateLookup(resp)) {
             // caching peer info
             markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-            console.log(resp.lon, resp.lat)
-
+            
             // adding peer location in map
             addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
         }
     })
 
     // requesting dht to lookup use provided magnet link's infoHash
+    dht.lookup(parsed.infoHash)
     // flash every .5 seconds
     setInterval(enableFlashEffect, 500)
 })
