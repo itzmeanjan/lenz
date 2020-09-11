@@ -75,7 +75,7 @@ getMyIP().then(ip => {
     const dht = new DHT()
 
     // starting server on 26666
-    dht.listen(26666, _ => { console.log('Listening ...') })
+    dht.listen(26666, _ => { console.log('Listening ...'.green) })
     // gets invoked when new bit torrent peer is found for a
     // specific infoHash
     dht.on('peer', (peer, infoHash, from) => {
@@ -83,14 +83,18 @@ getMyIP().then(ip => {
         let resp = lookup(peer.host)
         if (validateLookup(resp)) {
             // caching peer info
-            markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
+            markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
 
             // adding peer location in map
             addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
         }
     })
+    // In case of error
+    dht.on('error', err => {
+        console.log(`Error: ${err}`.red)
+    })
+
     // requesting dht to lookup use provided magnet link's infoHash
-    dht.lookup(parsed.infoHash)
     // flash every .5 seconds
     setInterval(enableFlashEffect, 500)
 })
