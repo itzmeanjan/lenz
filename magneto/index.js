@@ -75,7 +75,7 @@ getMyIP().then(ip => {
     const dht = new DHT()
 
     // starting server on 26666
-    dht.listen(26666, _ => { console.log('Listening ...'.green) })
+    dht.listen(23456, _ => { console.log('Listening ...'.green) })
     // gets invoked when new bit torrent peer is found for a
     // specific infoHash
     dht.on('peer', (peer, infoHash, from) => {
@@ -84,14 +84,11 @@ getMyIP().then(ip => {
         if (validateLookup(resp)) {
             // caching peer info
             markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+            console.log(resp.lon, resp.lat)
 
             // adding peer location in map
             addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
         }
-    })
-    // In case of error
-    dht.on('error', err => {
-        console.log(`Error: ${err}`.red)
     })
 
     // requesting dht to lookup use provided magnet link's infoHash
@@ -100,5 +97,9 @@ getMyIP().then(ip => {
 })
 
 // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-screen.key(['escape', 'q', 'C-c'], (ch, key) => process.exit(0))
+screen.key(['escape', 'q', 'C-c'], (ch, key) => {
+    screen.destroy()
+    console.log('[+]Done'.green)
+    process.exit(0)
+})
 screen.render()
