@@ -1,10 +1,11 @@
-const dotnet = require('dotenv')
-dotnet.config({ path: 'config.env' })
-
-const ip2location = require('ip2location-nodejs')
-ip2location.IP2Location_init(process.env.DB) // initializing database
-
+const { resolve } = require('path')
 const { isIP } = require('net')
+const ip2location = require('ip2location-nodejs')
+
+// database initialization
+const init = db => {
+    ip2location.IP2Location_init(resolve(db))
+}
 
 // Given a valid IPv{4, 6} address, it'll lookup
 // its location i.e. country, region, longitude & latitude
@@ -18,5 +19,6 @@ const lookup = ip => isIP(ip) === 0 ? null : {
 }
 
 module.exports = {
+    init,
     lookup
 }
