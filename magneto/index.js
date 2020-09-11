@@ -79,3 +79,20 @@ getMyIP().then(ip => {
 // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
 screen.key(['escape', 'q', 'C-c'], (ch, key) => process.exit(0))
 screen.render()
+
+// state of map, when true, is rendered with data
+// when false, canvas is cleared
+let on = true;
+// enabling flashing effect
+const enableFlashEffect = _ => {
+    if(on) {
+        markers.forEach(map.addMarker)
+    } else {
+        map.clearMarkers()
+    }
+
+    screen.render()
+    on = !on
+}
+
+setInterval(enableFlashEffect, 500)
