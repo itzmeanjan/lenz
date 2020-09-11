@@ -4,7 +4,8 @@ const yargs = require('yargs')
 const blessed = require('blessed')
 const contrib = require('blessed-contrib')
 const magnet = require('magnet-uri')
-colors = require('colors')
+const DHT = require('bittorrent-dht')
+require('colors')
 
 const { getMyIP } = require('./ip')
 const { lookup } = require('./locate')
@@ -22,7 +23,7 @@ const options = yargs
 // if gets parsed properly & `infoHash` of torrent can
 // be found, then we're good to go, otherwise, we'll exit
 const parsed = magnet(options.m)
-if(!parsed.infoHash) {
+if (!parsed.infoHash) {
     console.log('[!]Bad Torrent 🧲 Link'.red)
     process.exit(1)
 }
@@ -32,15 +33,37 @@ const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
 screen.append(map)
 
+// add marker on map in specified location
+const addMarkerAndRender = (lon, lat, color, char) => {
+    map.addMarker({ lon, lat, color, char })
+    screen.render()
+}
+
 // obtaining ip address of this machine, by sending query to
 // 'https://api.ipify.org?format=json'
 getMyIP().then(ip => {
     let resp = lookup(ip)
     if (validateLookup(resp)) {
-        // once location info available, adding this machine's location onto map
-        map.addMarker({ lon: resp.lon, lat: resp.lat, color: "red", char: "X" })
-        screen.render()
+        // adding this machine's location onto map
+        addMarkerAndRender(resp.lon, resp.lat, 'red', 'X')
     }
+
+    // now init-ing dht
+    const dht = new DHT()
+
+    // starting server on 26666
+    dht.listen(26666, _ => { console.log('Listening ...') })
+    // gets invoked when new bit torrent peer is found for a
+    // specific infoHash
+    dht.on('peer', (peer, infoHash, from) => {
+        // looking up peer location
+        let resp = lookup(peer.host)
+
+        // adding peer location in map
+        addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+    })
+    // requesting dht to lookup use provided magnet link's infoHash
+    dht.lookup(parsed.infoHash)
 })
 
 // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
