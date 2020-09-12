@@ -41,6 +41,10 @@ const checkDomainNameValidation = domain => {
     }
 }
 
+// validates looked up ip address info, because in case of
+// private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`
+const validateLookup = data => !(data.lon === 0 && data.lat === 0 && data.region === '-' && data.country === '-')
+
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/magneto`)
     .command('lookup <magnet> <db>', 'Look up peers by torrent infohash', {
@@ -49,10 +53,6 @@ require('yargs').scriptName('lenz'.magenta)
     }, argv => {
         checkDB5Existance(argv.db)
         const infoHash = checkMagnetLinkValidation(argv.magnet)
-
-        // validates looked up ip address info, because in case of
-        // private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`
-        const validateLookup = data => !(data.lon === 0 && data.lat === 0 && data.region === '-' && data.country === '-')
 
         // initialized ip2location db5 database
         init(argv.db)
@@ -139,5 +139,81 @@ require('yargs').scriptName('lenz'.magenta)
         }, argv => {
             checkDB5Existance(argv.db)
             checkDomainNameValidation(argv.domain)
+
+            init(argv.db)
+
+            const screen = blessed.screen()
+            const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
+
+            screen.append(map)
+
+            // add marker on map in specified location
+            const addMarkerAndRender = (lon, lat, color, char) => {
+                map.addMarker({ lon, lat, color, char })
+                screen.render()
+            }
+
+            // state of map, when true, is rendered with data
+            // when false, canvas is cleared
+            let on = true;
+            // enabling flashing effect
+            const enableFlashEffect = _ => {
+                if (on) {
+                    markers.forEach(v => {
+                        map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
+                    })
+                } else {
+                    map.clearMarkers()
+                }
+
+                screen.render()
+                on = !on
+            }
+
+            // markers to be drawn on screen cache
+            const markers = []
+
+            // obtaining ip address of this machine, by sending query to
+            // 'https://api.ipify.org?format=json'
+            getMyIP().then(ip => {
+                let resp = lookup(ip)
+                if (validateLookup(resp)) {
+                    // cached host machine IP
+                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
+
+                    // adding this machine's location onto map
+                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X')
+                }
+
+                dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
+                    if (err.code === 'ENOTFOUND') {
+                        screen.destroy()
+                        console.log('[!]Domain name look up failed'.red)
+                        process.exit(0)
+                    }
+
+                    addrs.forEach(v => {
+                        let resp = lookup(v.address)
+                        if (validateLookup(resp)) {
+                            // cached dns looked up remote address
+                            markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+
+                            // adding dns looked up address's location onto map
+                            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+                        }
+                    })
+                })
+
+                // flash every .5 seconds
+                setInterval(enableFlashEffect, 500)
+            })
+
+            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
+            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
+                screen.destroy()
+                console.log('[+]Done'.green)
+                process.exit(0)
+            })
+            screen.render()
         })
     .demandCommand().help().wrap(72).argv
