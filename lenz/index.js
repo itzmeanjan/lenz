@@ -12,6 +12,7 @@ require('colors')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
+const { ma } = require('is-valid-domain/domains/sld')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -54,6 +55,12 @@ const checkIPAddressValidation = ip => {
     }
 }
 
+// add marker on map in specified location
+const addMarkerAndRender = (lon, lat, color, char, map, screen) => {
+    map.addMarker({ lon, lat, color, char })
+    screen.render()
+}
+
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/magneto`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
@@ -70,12 +77,6 @@ require('yargs').scriptName('lenz'.magenta)
         const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
         screen.append(map)
-
-        // add marker on map in specified location
-        const addMarkerAndRender = (lon, lat, color, char) => {
-            map.addMarker({ lon, lat, color, char })
-            screen.render()
-        }
 
         // state of map, when true, is rendered with data
         // when false, canvas is cleared
@@ -104,9 +105,8 @@ require('yargs').scriptName('lenz'.magenta)
             if (validateLookup(resp)) {
                 // cached host machine IP
                 markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-
                 // adding this machine's location onto map
-                addMarkerAndRender(resp.lon, resp.lat, 'red', 'X')
+                addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
             }
 
             // now init-ing dht
@@ -122,9 +122,8 @@ require('yargs').scriptName('lenz'.magenta)
                 if (validateLookup(resp)) {
                     // caching peer info
                     markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-
                     // adding peer location in map
-                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                 }
             })
 
@@ -157,12 +156,6 @@ require('yargs').scriptName('lenz'.magenta)
 
             screen.append(map)
 
-            // add marker on map in specified location
-            const addMarkerAndRender = (lon, lat, color, char) => {
-                map.addMarker({ lon, lat, color, char })
-                screen.render()
-            }
-
             // state of map, when true, is rendered with data
             // when false, canvas is cleared
             let on = true;
@@ -190,9 +183,8 @@ require('yargs').scriptName('lenz'.magenta)
                 if (validateLookup(resp)) {
                     // cached host machine IP
                     markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-
                     // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X')
+                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
                 }
 
                 dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
@@ -207,9 +199,8 @@ require('yargs').scriptName('lenz'.magenta)
                         if (validateLookup(resp)) {
                             // cached dns looked up address's location info
                             markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-
                             // adding dns looked up address's location onto map
-                            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+                            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                         }
                     })
 
@@ -243,12 +234,6 @@ require('yargs').scriptName('lenz'.magenta)
 
             screen.append(map)
 
-            // add marker on map in specified location
-            const addMarkerAndRender = (lon, lat, color, char) => {
-                map.addMarker({ lon, lat, color, char })
-                screen.render()
-            }
-
             // state of map, when true, is rendered with data
             // when false, canvas is cleared
             let on = true;
@@ -276,18 +261,16 @@ require('yargs').scriptName('lenz'.magenta)
                 if (validateLookup(resp)) {
                     // cached host machine IP
                     markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-
                     // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X')
+                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
                 }
 
                 resp = lookup(argv.ip)
                 if (validateLookup(resp)) {
                     // cached target machine IP
                     markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-
                     // adding target machine's location into map
-                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                 }
 
                 console.log('Successful look up'.green)
