@@ -2,7 +2,7 @@
 
 Console based MAP 🗺 
 
-![sc](sc/sc.gif)
+![sc](sc/sc_2.png)
 
 ## motivation
 
@@ -16,7 +16,7 @@ I was looking for one fully console based location data visualiser, with below f
 
 which can be invoked in fully console based environments i.e. VM, VPS etc.
 
-But couldn't find one, may be I needed to try harder. 
+But couldn't find one, may be I required to try harder. 
 
 So I decided to write one, with all these above mentioned functionalites.
 
@@ -30,7 +30,7 @@ Consider using IPv6 version, cause that will also support IPv4 lookup. This spec
 
 Please try to stick with that, otherwise there might be some unexpected behaviours.
 
-And you need to have NodeJS( >10.X ).
+And we need to have NodeJS( >10.X ).
 
 ## installation
 
@@ -51,6 +51,7 @@ Lets get into project directory
 ```bash
 git clone git@github.com:itzmeanjan/lenz.git
 cd lenz/lenz
+npm install # installing all dependencies
 ```
 
 And install tool globally. Also make sure you've added NPM global installation path to your system **PATH** variable.
@@ -63,9 +64,9 @@ Now you can use `lenz` from any where in your directory tree.
 
 ## usage
 
-Invoke `lenz` from CLI, supply proper params for each of supported commands.
+Invoke `lenz` from CLI, supplying proper params for each of supported commands.
 
-![sc](sc/sc_2.gif)
+![sc](sc/sc_1.gif)
 
 ```bash
 5p1d3r:lenz anjan$ lenz
@@ -83,6 +84,8 @@ Options:
 
 Not enough non-option arguments: got 0, need at least 1
 ```
+
+> Please use tool's help option for getting more info related to support commands.
 
 ## contribution
 
