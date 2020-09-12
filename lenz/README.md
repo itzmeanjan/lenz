@@ -2,6 +2,8 @@
 
 Console based MAP 🗺 
 
+> More can be found [here](https://github.com/itzmeanjan/lenz#motivation)
+
 ## prerequisite
 
 We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude) for using this tool.
