@@ -62,7 +62,7 @@ const addMarkerAndRender = (lon, lat, color, char, map, screen) => {
 }
 
 require('yargs').scriptName('lenz'.magenta)
-    .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/magneto`)
+    .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
         magnet: { describe: 'torrent 🧲 link', type: 'string' },
         db: { describe: 'path to ip2location-db5.bin', type: 'string' }
