@@ -94,7 +94,7 @@ const worker = (map, screen, fn) => getMyIP().then(ip => {
     }
 
     // middleware to be invoked
-    fn()
+    fn(map, screen)
 
     // flash every .5 seconds
     setInterval(enableFlashEffect, 500, map, screen)
@@ -131,7 +131,7 @@ require('yargs').scriptName('lenz'.magenta)
 
         // initialized ip2location db5 database
         init(argv.db)
-        render(_ => {
+        render((map, screen) => {
             // now init-ing dht
             const dht = new DHT()
 
@@ -163,7 +163,7 @@ require('yargs').scriptName('lenz'.magenta)
             checkDomainNameValidation(argv.domain)
 
             init(argv.db)
-            render(_ => {
+            render((map, screen) => {
                 dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
                     if (err !== undefined && err !== null) {
                         screen.destroy()
@@ -194,7 +194,7 @@ require('yargs').scriptName('lenz'.magenta)
             checkIPAddressValidation(argv.ip)
 
             init(argv.db)
-            render(_ => {
+            render((map, screen) => {
                 let resp = lookup(argv.ip)
                 if (validateLookup(resp)) {
                     // cached target machine IP
