@@ -145,13 +145,7 @@ require('yargs').scriptName('lenz'.magenta)
             setInterval(enableFlashEffect, 500, map, screen)
         })
 
-        // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-        screen.key(['escape', 'q', 'C-c'], (ch, key) => {
-            screen.destroy()
-            console.log('[+]Done'.green)
-            process.exit(0)
-        })
-        screen.render()
+        setUpScreenAndRender(screen)
     })
     .command('ld <domain> <db>', 'Find location of Domain Name',
         {
@@ -203,13 +197,7 @@ require('yargs').scriptName('lenz'.magenta)
                 setInterval(enableFlashEffect, 500, map, screen)
             })
 
-            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
-                screen.destroy()
-                console.log('[+]Done'.green)
-                process.exit(0)
-            })
-            screen.render()
+            setUpScreenAndRender(screen)
         })
     .command('lp <ip> <db>', 'Find location of IP Address',
         {
@@ -251,12 +239,6 @@ require('yargs').scriptName('lenz'.magenta)
                 setInterval(enableFlashEffect, 500, map, screen)
             })
 
-            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
-                screen.destroy()
-                console.log('[+]Done'.green)
-                process.exit(0)
-            })
-            screen.render()
+            setUpScreenAndRender(screen)
         })
     .demandCommand().help().wrap(72).argv
