@@ -89,7 +89,7 @@ Options:
 Not enough non-option arguments: got 0, need at least 1
 ```
 
-> Please use tool's help option for getting more info related to support commands.
+> Please use tool's help option for getting more info related to supported commands.
 
 ### show peers by magnet link ( lm )
 
