@@ -4,11 +4,21 @@ const blessed = require('blessed')
 const contrib = require('blessed-contrib')
 const magnet = require('magnet-uri')
 const { existsSync } = require('fs')
+const dns = require('dns')
 const DHT = require('bittorrent-dht')
 require('colors')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
+
+// checking existance of local ip2location db5 file
+// if not present, exit process with return code 1
+const checkDB5Existance = db => {
+    if (!existsSync(db)) {
+        console.log('[!]Can\'t find IP2Location DB5'.red)
+        process.exit(1)
+    }
+}
 
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/magneto`)
@@ -24,11 +34,7 @@ require('yargs').scriptName('lenz'.magenta)
             process.exit(1)
         }
 
-        // checking existance of local ip2location db5 file
-        if (!existsSync(argv.db)) {
-            console.log('[!]Can\'t find IP2Location DB5'.red)
-            process.exit(1)
-        }
+        checkDB5Existance(argv.db)
 
         // validates looked up ip address info, because in case of
         // private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`
@@ -112,4 +118,11 @@ require('yargs').scriptName('lenz'.magenta)
             process.exit(0)
         })
         screen.render()
-    }).demandCommand().help().wrap(72).argv
+    }).command('locate <domain> <db>', 'Find IP based location of domain',
+        {
+            domain: { describe: 'domain name to be looked up', type: 'string' },
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' }
+        }, argv => {
+
+        })
+    .demandCommand().help().wrap(72).argv
