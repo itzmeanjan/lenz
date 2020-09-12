@@ -34,9 +34,17 @@ And you need to have NodeJS( >10.X ).
 
 ## installation
 
-I've planned to distribute this software using NPM, which is yet to be done.
+### using NPM
 
-In the mean time, you can try to clone this repo in your local machine and run below commands to use this CLI tool.
+[This](https://www.npmjs.com/package/lenz) software is distributed using NPM.
+
+```bash
+npm i -g lenz
+```
+
+### using GITHUB
+
+You can clone this repo in your machine and run below commands to use this CLI tool.
 
 Lets get into project directory
 
