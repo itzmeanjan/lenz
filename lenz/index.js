@@ -79,9 +79,37 @@ const enableFlashEffect = (map, screen) => {
     on = !on
 }
 
-// initial rendering to be done here, on provided
-// screen handler & exit mechanism to be set up
-const setUpScreenAndRender = screen => {
+// Actual location drawing manager
+//
+// first finds this machine's IP & draws it
+// then invokes middleware supplied
+// and enables location marker flashing mechanism
+const worker = (map, screen, fn) => getMyIP().then(ip => {
+    let resp = lookup(ip)
+    if (validateLookup(resp)) {
+        // cached host machine IP
+        markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
+        // adding this machine's location onto map
+        addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
+    }
+
+    // middleware to be invoked
+    fn(map, screen)
+
+    // flash every .5 seconds
+    setInterval(enableFlashEffect, 500, map, screen)
+})
+
+// initial rendering to be done here, on created
+// screen handler; middleware set up & exit mechanism set up, 
+// also to be done here i.e. whole application UI setup to be made here
+const render = fn => {
+    const screen = blessed.screen()
+    const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
+
+    screen.append(map)
+    worker(map, screen, fn)
+
     // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
     screen.key(['escape', 'q', 'C-c'], (ch, key) => {
         screen.destroy()
@@ -90,29 +118,6 @@ const setUpScreenAndRender = screen => {
     })
     // first screen render
     screen.render()
-}
-
-// Actual location drawing manager
-//
-// first finds this machine's IP & draws it
-// then invokes middleware supplied
-// and enables location marker flashing mechanism
-const worker = (map, screen, fn) => {
-    getMyIP().then(ip => {
-        let resp = lookup(ip)
-        if (validateLookup(resp)) {
-            // cached host machine IP
-            markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-            // adding this machine's location onto map
-            addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
-        }
-
-        // middleware to be invoked
-        fn()
-
-        // flash every .5 seconds
-        setInterval(enableFlashEffect, 500, map, screen)
-    })
 }
 
 require('yargs').scriptName('lenz'.magenta)
@@ -126,12 +131,7 @@ require('yargs').scriptName('lenz'.magenta)
 
         // initialized ip2location db5 database
         init(argv.db)
-
-        const screen = blessed.screen()
-        const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
-
-        screen.append(map)
-        worker(map, screen, _ => {
+        render((map, screen) => {
             // now init-ing dht
             const dht = new DHT()
 
@@ -153,7 +153,6 @@ require('yargs').scriptName('lenz'.magenta)
             // requesting dht to lookup use provided magnet link's infoHash
             dht.lookup(infoHash)
         })
-        setUpScreenAndRender(screen)
     })
     .command('ld <domain> <db>', 'Find location of Domain Name',
         {
@@ -164,12 +163,7 @@ require('yargs').scriptName('lenz'.magenta)
             checkDomainNameValidation(argv.domain)
 
             init(argv.db)
-
-            const screen = blessed.screen()
-            const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
-
-            screen.append(map)
-            worker(map, screen, _ => {
+            render((map, screen) => {
                 dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
                     if (err !== undefined && err !== null) {
                         screen.destroy()
@@ -190,7 +184,6 @@ require('yargs').scriptName('lenz'.magenta)
                     console.log('Successful look up'.green)
                 })
             })
-            setUpScreenAndRender(screen)
         })
     .command('lp <ip> <db>', 'Find location of IP Address',
         {
@@ -201,12 +194,7 @@ require('yargs').scriptName('lenz'.magenta)
             checkIPAddressValidation(argv.ip)
 
             init(argv.db)
-
-            const screen = blessed.screen()
-            const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
-
-            screen.append(map)
-            worker(map, screen, _ => {
+            render((map, screen) => {
                 let resp = lookup(argv.ip)
                 if (validateLookup(resp)) {
                     // cached target machine IP
@@ -217,6 +205,5 @@ require('yargs').scriptName('lenz'.magenta)
 
                 console.log('Successful look up'.green)
             })
-            setUpScreenAndRender(screen)
         })
     .demandCommand().help().wrap(72).argv
