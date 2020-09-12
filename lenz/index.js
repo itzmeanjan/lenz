@@ -80,6 +80,19 @@ const enableFlashEffect = (map, screen) => {
     on = !on
 }
 
+// initial rendering to be done here, on provided
+// screen handler & exit mechanism to be set up
+const setUpScreenAndRender = screen => {
+    // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
+    screen.key(['escape', 'q', 'C-c'], (_, _) => {
+        screen.destroy()
+        console.log('[+]Done'.green)
+        process.exit(0)
+    })
+    // first screen render
+    screen.render()
+}
+
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
