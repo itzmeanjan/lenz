@@ -57,6 +57,8 @@ Now you can use `lenz` from any where in your directory tree.
 
 Invoke `lenz` from CLI, supply proper params for each of supported commands.
 
+![sc](sc/sc_2.gif)
+
 ```bash
 5p1d3r:lenz anjan$ lenz
 [+]Author  : Anjan Roy < anjanroy@yandex.com >
