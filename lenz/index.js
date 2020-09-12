@@ -12,6 +12,17 @@ require('colors')
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
 
+// validating user given torrent magnet link
+const checkMagnetLinkValidation = _magnet => {
+    const parsed = magnet(_magnet)
+    if (!parsed.infoHash) {
+        console.log('[!]Bad Torrent 🧲 Link'.red)
+        process.exit(1)
+    }
+
+    return parsed.infoHash
+}
+
 // checking existance of local ip2location db5 file
 // if not present, exit process with return code 1
 const checkDB5Existance = db => {
@@ -36,15 +47,8 @@ require('yargs').scriptName('lenz'.magenta)
         magnet: { describe: 'torrent 🧲 link', type: 'string' },
         db: { describe: 'path to ip2location-db5.bin', type: 'string' }
     }, argv => {
-        // if gets parsed properly & `infoHash` of torrent can
-        // be found, then we're good to go, otherwise, we'll exit
-        const parsed = magnet(argv.magnet)
-        if (!parsed.infoHash) {
-            console.log('[!]Bad Torrent 🧲 Link'.red)
-            process.exit(1)
-        }
-
         checkDB5Existance(argv.db)
+        const infoHash = checkMagnetLinkValidation(argv.magnet)
 
         // validates looked up ip address info, because in case of
         // private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`
@@ -116,7 +120,7 @@ require('yargs').scriptName('lenz'.magenta)
             })
 
             // requesting dht to lookup use provided magnet link's infoHash
-            dht.lookup(parsed.infoHash)
+            dht.lookup(infoHash)
             // flash every .5 seconds
             setInterval(enableFlashEffect, 500)
         })
@@ -133,10 +137,7 @@ require('yargs').scriptName('lenz'.magenta)
             domain: { describe: 'domain name to be looked up', type: 'string' },
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
         }, argv => {
-            if(!isValidDomain(argv.domain)) {
-
-            }
-
             checkDB5Existance(argv.db)
+            checkDomainNameValidation(argv.domain)
         })
     .demandCommand().help().wrap(72).argv
