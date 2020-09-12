@@ -131,18 +131,7 @@ require('yargs').scriptName('lenz'.magenta)
         const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
         screen.append(map)
-
-        // obtaining ip address of this machine, by sending query to
-        // 'https://api.ipify.org?format=json'
-        getMyIP().then(ip => {
-            let resp = lookup(ip)
-            if (validateLookup(resp)) {
-                // cached host machine IP
-                markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-                // adding this machine's location onto map
-                addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
-            }
-
+        worker(map, screen, _ => {
             // now init-ing dht
             const dht = new DHT()
 
@@ -163,10 +152,7 @@ require('yargs').scriptName('lenz'.magenta)
 
             // requesting dht to lookup use provided magnet link's infoHash
             dht.lookup(infoHash)
-            // flash every .5 seconds
-            setInterval(enableFlashEffect, 500, map, screen)
         })
-
         setUpScreenAndRender(screen)
     })
     .command('ld <domain> <db>', 'Find location of Domain Name',
