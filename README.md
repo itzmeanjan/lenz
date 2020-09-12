@@ -68,6 +68,10 @@ Invoke `lenz` from CLI, supplying proper params for each of supported commands.
 
 ![sc](sc/sc_1.gif)
 
+> ❌ : Your location, using IP address
+
+> ⭕️ : Peer(s) location
+
 ```bash
 5p1d3r:lenz anjan$ lenz
 [+]Author  : Anjan Roy < anjanroy@yandex.com >
@@ -86,6 +90,63 @@ Not enough non-option arguments: got 0, need at least 1
 ```
 
 > Please use tool's help option for getting more info related to support commands.
+
+### show peers by magnet link ( lm )
+
+Get a magnet link & supply it while invoking `lenz`
+
+```bash
+5p1d3r:lenz anjan$ lenz lm
+lenz lm <magnet> <db>
+
+Find peers by Torrent Infohash
+
+Options:
+  --version  Show version number                               [boolean]
+  --help     Show help                                         [boolean]
+  --magnet   torrent 🧲 link                                    [string]
+  --db       path to ip2location-db5.bin                        [string]
+
+Not enough non-option arguments: got 0, need at least 2
+```
+
+### look up by domain name ( ld )
+
+Domain name to be resolved to IPv _{4,6}_ addresses & shown on console map.
+
+```bash
+5p1d3r:lenz anjan$ lenz ld
+lenz ld <domain> <db>
+
+Find location of Domain Name
+
+Options:
+  --version  Show version number                               [boolean]
+  --help     Show help                                         [boolean]
+  --domain   domain name to be looked up                        [string]
+  --db       path to ip2location-db5.bin                        [string]
+
+Not enough non-option arguments: got 0, need at least 2
+```
+
+### look up by ip address ( lp )
+
+Looks up IPv _{4,6}_  address location & shows on console map.
+
+```bash
+5p1d3r:lenz anjan$ lenz lp
+lenz lp <ip> <db>
+
+Find location of IP Address
+
+Options:
+  --version  Show version number                               [boolean]
+  --help     Show help                                         [boolean]
+  --ip       IP Address to be located                           [string]
+  --db       path to ip2location-db5.bin                        [string]
+
+Not enough non-option arguments: got 0, need at least 2
+```
 
 ## contribution
 
