@@ -2,6 +2,8 @@
 
 Console based MAP 🗺 
 
+![sc](sc/sc.gif)
+
 ## motivation
 
 I was looking for one fully console based location data visualiser, with below functionalities 
