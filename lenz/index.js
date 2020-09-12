@@ -10,8 +10,8 @@ require('colors')
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
 
-require('yargs').scriptName('magneto'.magenta)
-    .usage(`${'[+]Author:'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Remote:'.bgGreen} https://github.com/itzmeanjan/magneto`)
+require('yargs').scriptName('lenz'.magenta)
+    .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/magneto`)
     .command('lookup <magnet> <db>', 'Look up peers by torrent infohash', {
         magnet: { describe: 'torrent 🧲 link', type: 'string' },
         db: { describe: 'path to ip2location-db5.bin', type: 'string' }
