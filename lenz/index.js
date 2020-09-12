@@ -12,7 +12,6 @@ require('colors')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
-const { ma } = require('is-valid-domain/domains/sld')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -93,6 +92,29 @@ const setUpScreenAndRender = screen => {
     screen.render()
 }
 
+// Actual location drawing manager
+//
+// first finds this machine's IP & draws it
+// then invokes middleware supplied
+// and enables location marker flashing mechanism
+const worker = (map, screen, fn) => {
+    getMyIP().then(ip => {
+        let resp = lookup(ip)
+        if (validateLookup(resp)) {
+            // cached host machine IP
+            markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
+            // adding this machine's location onto map
+            addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
+        }
+
+        // middleware to be invoked
+        fn()
+
+        // flash every .5 seconds
+        setInterval(enableFlashEffect, 500, map, screen)
+    })
+}
+
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
@@ -161,18 +183,7 @@ require('yargs').scriptName('lenz'.magenta)
             const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
             screen.append(map)
-
-            // obtaining ip address of this machine, by sending query to
-            // 'https://api.ipify.org?format=json'
-            getMyIP().then(ip => {
-                let resp = lookup(ip)
-                if (validateLookup(resp)) {
-                    // cached host machine IP
-                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-                    // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
-                }
-
+            worker(map, screen, _ => {
                 dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
                     if (err !== undefined && err !== null) {
                         screen.destroy()
@@ -192,11 +203,7 @@ require('yargs').scriptName('lenz'.magenta)
 
                     console.log('Successful look up'.green)
                 })
-
-                // flash every .5 seconds
-                setInterval(enableFlashEffect, 500, map, screen)
             })
-
             setUpScreenAndRender(screen)
         })
     .command('lp <ip> <db>', 'Find location of IP Address',
