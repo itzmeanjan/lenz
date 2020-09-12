@@ -220,19 +220,8 @@ require('yargs').scriptName('lenz'.magenta)
             const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
             screen.append(map)
-
-            // obtaining ip address of this machine, by sending query to
-            // 'https://api.ipify.org?format=json'
-            getMyIP().then(ip => {
-                let resp = lookup(ip)
-                if (validateLookup(resp)) {
-                    // cached host machine IP
-                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-                    // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
-                }
-
-                resp = lookup(argv.ip)
+            worker(map, screen, _ => {
+                let resp = lookup(argv.ip)
                 if (validateLookup(resp)) {
                     // cached target machine IP
                     markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
@@ -241,11 +230,7 @@ require('yargs').scriptName('lenz'.magenta)
                 }
 
                 console.log('Successful look up'.green)
-
-                // flash every .5 seconds
-                setInterval(enableFlashEffect, 500, map, screen)
             })
-
             setUpScreenAndRender(screen)
         })
     .demandCommand().help().wrap(72).argv
