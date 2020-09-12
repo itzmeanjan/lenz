@@ -1,7 +1,7 @@
 {
   "name": "lenz",
   "version": "1.0.0",
-  "description": "Console based generalized location visualizer 👀",
+  "description": "Console based MAP 🗺",
   "main": "index.js",
   "bin": {
     "lenz": "./index.js"
@@ -20,6 +20,11 @@
     "magnet",
     "link",
     "location",
+    "visuliser",
+    "map",
+    "ascii",
+    "ansi",
+    "ip",
     "console",
     "dataviz",
     "domains",
