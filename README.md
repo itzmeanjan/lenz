@@ -1,2 +1,3 @@
-# magneto
-Peer Visualiser from Torrent 🧲  Link
+# lenz 🤓
+
+Console based generalized location visualizer 👀

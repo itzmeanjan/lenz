@@ -1,10 +1,10 @@
 {
-  "name": "magneto",
+  "name": "lenz",
   "version": "1.0.0",
-  "description": "Peer Visualiser using Torrent 🧲 Link",
+  "description": "Console based generalized location visualizer 👀",
   "main": "index.js",
   "bin": {
-    "magneto": "./index.js"
+    "lenz": "./index.js"
   },
   "scripts": {
     "start": "node index.js",
@@ -12,22 +12,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/itzmeanjan/magneto.git"
+    "url": "git+https://github.com/itzmeanjan/lenz.git"
   },
   "keywords": [
-    "magneto",
+    "lenz",
     "torrent",
     "magnet",
     "link",
+    "location",
+    "console",
     "dataviz",
+    "domains",
     "peer"
   ],
   "author": "Anjan Roy <anjanroy@yandex.com>",
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/itzmeanjan/magneto/issues"
+    "url": "https://github.com/itzmeanjan/lenz/issues"
   },
-  "homepage": "https://github.com/itzmeanjan/magneto#readme",
+  "homepage": "https://github.com/itzmeanjan/lenz#readme",
   "dependencies": {
     "axios": "^0.20.0",
     "bittorrent-dht": "^10.0.0",
@@ -35,6 +38,7 @@
     "blessed-contrib": "^4.8.20",
     "colors": "^1.4.0",
     "ip2location-nodejs": "^8.3.0",
+    "is-valid-domain": "0.0.15",
     "magnet-uri": "^5.3.0",
     "yargs": "^16.0.3"
   }
