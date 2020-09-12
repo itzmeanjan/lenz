@@ -61,6 +61,25 @@ const addMarkerAndRender = (lon, lat, color, char, map, screen) => {
     screen.render()
 }
 
+// cache for markers to be drawn on screen
+const markers = []
+// state of map, when true, is rendered with data
+// when false, canvas is cleared
+let on = true;
+// enabling flashing effect
+const enableFlashEffect = (map, screen) => {
+    if (on) {
+        markers.forEach(v => {
+            map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
+        })
+    } else {
+        map.clearMarkers()
+    }
+
+    screen.render()
+    on = !on
+}
+
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
@@ -77,26 +96,6 @@ require('yargs').scriptName('lenz'.magenta)
         const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
         screen.append(map)
-
-        // state of map, when true, is rendered with data
-        // when false, canvas is cleared
-        let on = true;
-        // enabling flashing effect
-        const enableFlashEffect = _ => {
-            if (on) {
-                markers.forEach(v => {
-                    map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
-                })
-            } else {
-                map.clearMarkers()
-            }
-
-            screen.render()
-            on = !on
-        }
-
-        // markers to be drawn on screen cache
-        const markers = []
 
         // obtaining ip address of this machine, by sending query to
         // 'https://api.ipify.org?format=json'
@@ -130,7 +129,7 @@ require('yargs').scriptName('lenz'.magenta)
             // requesting dht to lookup use provided magnet link's infoHash
             dht.lookup(infoHash)
             // flash every .5 seconds
-            setInterval(enableFlashEffect, 500)
+            setInterval(enableFlashEffect, 500, map, screen)
         })
 
         // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
@@ -155,26 +154,6 @@ require('yargs').scriptName('lenz'.magenta)
             const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
             screen.append(map)
-
-            // state of map, when true, is rendered with data
-            // when false, canvas is cleared
-            let on = true;
-            // enabling flashing effect
-            const enableFlashEffect = _ => {
-                if (on) {
-                    markers.forEach(v => {
-                        map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
-                    })
-                } else {
-                    map.clearMarkers()
-                }
-
-                screen.render()
-                on = !on
-            }
-
-            // markers to be drawn on screen cache
-            const markers = []
 
             // obtaining ip address of this machine, by sending query to
             // 'https://api.ipify.org?format=json'
@@ -208,7 +187,7 @@ require('yargs').scriptName('lenz'.magenta)
                 })
 
                 // flash every .5 seconds
-                setInterval(enableFlashEffect, 500)
+                setInterval(enableFlashEffect, 500, map, screen)
             })
 
             // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
@@ -234,26 +213,6 @@ require('yargs').scriptName('lenz'.magenta)
 
             screen.append(map)
 
-            // state of map, when true, is rendered with data
-            // when false, canvas is cleared
-            let on = true;
-            // enabling flashing effect
-            const enableFlashEffect = _ => {
-                if (on) {
-                    markers.forEach(v => {
-                        map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
-                    })
-                } else {
-                    map.clearMarkers()
-                }
-
-                screen.render()
-                on = !on
-            }
-
-            // markers to be drawn on screen cache
-            const markers = []
-
             // obtaining ip address of this machine, by sending query to
             // 'https://api.ipify.org?format=json'
             getMyIP().then(ip => {
@@ -276,7 +235,7 @@ require('yargs').scriptName('lenz'.magenta)
                 console.log('Successful look up'.green)
 
                 // flash every .5 seconds
-                setInterval(enableFlashEffect, 500)
+                setInterval(enableFlashEffect, 500, map, screen)
             })
 
             // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
