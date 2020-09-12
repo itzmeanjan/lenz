@@ -84,7 +84,7 @@ const enableFlashEffect = (map, screen) => {
 // screen handler & exit mechanism to be set up
 const setUpScreenAndRender = screen => {
     // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-    screen.key(['escape', 'q', 'C-c'], (_, _) => {
+    screen.key(['escape', 'q', 'C-c'], (ch, key) => {
         screen.destroy()
         console.log('[+]Done'.green)
         process.exit(0)
