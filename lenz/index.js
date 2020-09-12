@@ -132,7 +132,7 @@ require('yargs').scriptName('lenz'.magenta)
             process.exit(0)
         })
         screen.render()
-    }).command('locate <domain> <db>', 'Find IP based location of domain',
+    }).command('locate <domain> <db>', 'Find IP based location of domain name',
         {
             domain: { describe: 'domain name to be looked up', type: 'string' },
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
@@ -186,7 +186,7 @@ require('yargs').scriptName('lenz'.magenta)
                 }
 
                 dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
-                    if (err.code === 'ENOTFOUND') {
+                    if (err !== undefined && err !== null) {
                         screen.destroy()
                         console.log('[!]Domain name look up failed'.red)
                         process.exit(0)
@@ -195,13 +195,15 @@ require('yargs').scriptName('lenz'.magenta)
                     addrs.forEach(v => {
                         let resp = lookup(v.address)
                         if (validateLookup(resp)) {
-                            // cached dns looked up remote address
+                            // cached dns looked up address's location info
                             markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
 
                             // adding dns looked up address's location onto map
                             addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
                         }
                     })
+
+                    console.log('Successful look up'.green)
                 })
 
                 // flash every .5 seconds
