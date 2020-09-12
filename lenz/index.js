@@ -56,7 +56,7 @@ const checkIPAddressValidation = ip => {
 
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/magneto`)
-    .command('lookup <magnet> <db>', 'Look up peers by torrent infohash', {
+    .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
         magnet: { describe: 'torrent 🧲 link', type: 'string' },
         db: { describe: 'path to ip2location-db5.bin', type: 'string' }
     }, argv => {
@@ -142,7 +142,7 @@ require('yargs').scriptName('lenz'.magenta)
         })
         screen.render()
     })
-    .command('locate <domain> <db>', 'Find location of domain name',
+    .command('ld <domain> <db>', 'Find location of Domain Name',
         {
             domain: { describe: 'domain name to be looked up', type: 'string' },
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
@@ -228,7 +228,7 @@ require('yargs').scriptName('lenz'.magenta)
             })
             screen.render()
         })
-    .command('locate <ip> <db>', 'Find location of IP Address',
+    .command('lp <ip> <db>', 'Find location of IP Address',
         {
             ip: { describe: 'IP Address to be located', type: 'string' },
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
@@ -291,7 +291,7 @@ require('yargs').scriptName('lenz'.magenta)
                 }
 
                 console.log('Successful look up'.green)
-                
+
                 // flash every .5 seconds
                 setInterval(enableFlashEffect, 500)
             })
