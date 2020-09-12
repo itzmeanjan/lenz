@@ -5,6 +5,7 @@ const contrib = require('blessed-contrib')
 const magnet = require('magnet-uri')
 const { existsSync } = require('fs')
 const dns = require('dns')
+const isValidDomain = require('is-valid-domain')
 const DHT = require('bittorrent-dht')
 require('colors')
 
@@ -16,6 +17,15 @@ const { init, lookup } = require('./locate')
 const checkDB5Existance = db => {
     if (!existsSync(db)) {
         console.log('[!]Can\'t find IP2Location DB5'.red)
+        process.exit(1)
+    }
+}
+
+// checking whether supplied domain name is valid or not
+// if not, exit process with return code 1
+const checkDomainNameValidation = domain => {
+    if (!isValidDomain(domain)) {
+        console.log('[!]Invalid domain name'.red)
         process.exit(1)
     }
 }
@@ -123,6 +133,10 @@ require('yargs').scriptName('lenz'.magenta)
             domain: { describe: 'domain name to be looked up', type: 'string' },
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
         }, argv => {
+            if(!isValidDomain(argv.domain)) {
 
+            }
+
+            checkDB5Existance(argv.db)
         })
     .demandCommand().help().wrap(72).argv
