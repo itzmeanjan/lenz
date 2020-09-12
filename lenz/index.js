@@ -4,6 +4,7 @@ const blessed = require('blessed')
 const contrib = require('blessed-contrib')
 const magnet = require('magnet-uri')
 const { existsSync } = require('fs')
+const { isIP } = require('net')
 const dns = require('dns')
 const isValidDomain = require('is-valid-domain')
 const DHT = require('bittorrent-dht')
@@ -45,9 +46,78 @@ const checkDomainNameValidation = domain => {
 // private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`
 const validateLookup = data => !(data.lon === 0 && data.lat === 0 && data.region === '-' && data.country === '-')
 
+// validates user provided IPv{4,6} address
+const checkIPAddressValidation = ip => {
+    if (!isIP(ip)) {
+        console.log('[!]Invalid IP Address'.red)
+        process.exit(1)
+    }
+}
+
+// add marker on map in specified location
+const addMarkerAndRender = (lon, lat, color, char, map, screen) => {
+    map.addMarker({ lon, lat, color, char })
+    screen.render()
+}
+
+// cache for markers to be drawn on screen
+const markers = []
+// state of map, when true, is rendered with data
+// when false, canvas is cleared
+let on = true;
+// enabling flashing effect
+const enableFlashEffect = (map, screen) => {
+    if (on) {
+        markers.forEach(v => {
+            map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
+        })
+    } else {
+        map.clearMarkers()
+    }
+
+    screen.render()
+    on = !on
+}
+
+// initial rendering to be done here, on provided
+// screen handler & exit mechanism to be set up
+const setUpScreenAndRender = screen => {
+    // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
+    screen.key(['escape', 'q', 'C-c'], (ch, key) => {
+        screen.destroy()
+        console.log('[+]Done'.green)
+        process.exit(0)
+    })
+    // first screen render
+    screen.render()
+}
+
+// Actual location drawing manager
+//
+// first finds this machine's IP & draws it
+// then invokes middleware supplied
+// and enables location marker flashing mechanism
+const worker = (map, screen, fn) => {
+    getMyIP().then(ip => {
+        let resp = lookup(ip)
+        if (validateLookup(resp)) {
+            // cached host machine IP
+            markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
+            // adding this machine's location onto map
+            addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
+        }
+
+        // middleware to be invoked
+        fn()
+
+        // flash every .5 seconds
+        setInterval(enableFlashEffect, 500, map, screen)
+    })
+}
+
 require('yargs').scriptName('lenz'.magenta)
-    .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/magneto`)
-    .command('lookup <magnet> <db>', 'Look up peers by torrent infohash', {
+    .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
+    .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
         magnet: { describe: 'torrent 🧲 link', type: 'string' },
         db: { describe: 'path to ip2location-db5.bin', type: 'string' }
     }, argv => {
@@ -61,45 +131,7 @@ require('yargs').scriptName('lenz'.magenta)
         const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
         screen.append(map)
-
-        // add marker on map in specified location
-        const addMarkerAndRender = (lon, lat, color, char) => {
-            map.addMarker({ lon, lat, color, char })
-            screen.render()
-        }
-
-        // state of map, when true, is rendered with data
-        // when false, canvas is cleared
-        let on = true;
-        // enabling flashing effect
-        const enableFlashEffect = _ => {
-            if (on) {
-                markers.forEach(v => {
-                    map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
-                })
-            } else {
-                map.clearMarkers()
-            }
-
-            screen.render()
-            on = !on
-        }
-
-        // markers to be drawn on screen cache
-        const markers = []
-
-        // obtaining ip address of this machine, by sending query to
-        // 'https://api.ipify.org?format=json'
-        getMyIP().then(ip => {
-            let resp = lookup(ip)
-            if (validateLookup(resp)) {
-                // cached host machine IP
-                markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-
-                // adding this machine's location onto map
-                addMarkerAndRender(resp.lon, resp.lat, 'red', 'X')
-            }
-
+        worker(map, screen, _ => {
             // now init-ing dht
             const dht = new DHT()
 
@@ -113,26 +145,17 @@ require('yargs').scriptName('lenz'.magenta)
                 if (validateLookup(resp)) {
                     // caching peer info
                     markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-
                     // adding peer location in map
-                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                 }
             })
 
             // requesting dht to lookup use provided magnet link's infoHash
             dht.lookup(infoHash)
-            // flash every .5 seconds
-            setInterval(enableFlashEffect, 500)
         })
-
-        // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-        screen.key(['escape', 'q', 'C-c'], (ch, key) => {
-            screen.destroy()
-            console.log('[+]Done'.green)
-            process.exit(0)
-        })
-        screen.render()
-    }).command('locate <domain> <db>', 'Find IP based location of domain name',
+        setUpScreenAndRender(screen)
+    })
+    .command('ld <domain> <db>', 'Find location of Domain Name',
         {
             domain: { describe: 'domain name to be looked up', type: 'string' },
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
@@ -146,45 +169,7 @@ require('yargs').scriptName('lenz'.magenta)
             const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
 
             screen.append(map)
-
-            // add marker on map in specified location
-            const addMarkerAndRender = (lon, lat, color, char) => {
-                map.addMarker({ lon, lat, color, char })
-                screen.render()
-            }
-
-            // state of map, when true, is rendered with data
-            // when false, canvas is cleared
-            let on = true;
-            // enabling flashing effect
-            const enableFlashEffect = _ => {
-                if (on) {
-                    markers.forEach(v => {
-                        map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
-                    })
-                } else {
-                    map.clearMarkers()
-                }
-
-                screen.render()
-                on = !on
-            }
-
-            // markers to be drawn on screen cache
-            const markers = []
-
-            // obtaining ip address of this machine, by sending query to
-            // 'https://api.ipify.org?format=json'
-            getMyIP().then(ip => {
-                let resp = lookup(ip)
-                if (validateLookup(resp)) {
-                    // cached host machine IP
-                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
-
-                    // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X')
-                }
-
+            worker(map, screen, _ => {
                 dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
                     if (err !== undefined && err !== null) {
                         screen.destroy()
@@ -197,25 +182,41 @@ require('yargs').scriptName('lenz'.magenta)
                         if (validateLookup(resp)) {
                             // cached dns looked up address's location info
                             markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-
                             // adding dns looked up address's location onto map
-                            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o')
+                            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                         }
                     })
 
                     console.log('Successful look up'.green)
                 })
-
-                // flash every .5 seconds
-                setInterval(enableFlashEffect, 500)
             })
+            setUpScreenAndRender(screen)
+        })
+    .command('lp <ip> <db>', 'Find location of IP Address',
+        {
+            ip: { describe: 'IP Address to be located', type: 'string' },
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' }
+        }, argv => {
+            checkDB5Existance(argv.db)
+            checkIPAddressValidation(argv.ip)
 
-            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
-                screen.destroy()
-                console.log('[+]Done'.green)
-                process.exit(0)
+            init(argv.db)
+
+            const screen = blessed.screen()
+            const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
+
+            screen.append(map)
+            worker(map, screen, _ => {
+                let resp = lookup(argv.ip)
+                if (validateLookup(resp)) {
+                    // cached target machine IP
+                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                    // adding target machine's location into map
+                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
+                }
+
+                console.log('Successful look up'.green)
             })
-            screen.render()
+            setUpScreenAndRender(screen)
         })
     .demandCommand().help().wrap(72).argv
