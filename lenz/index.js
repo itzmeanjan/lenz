@@ -81,7 +81,13 @@ const enableFlashEffect = (map, screen) => {
 
 // initial rendering to be done here, on provided
 // screen handler & exit mechanism to be set up
-const setUpScreenAndRender = screen => {
+const setUpScreenAndRender = fn => {
+    const screen = blessed.screen()
+    const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
+    
+    screen.append(map)
+    worker(map, screen, fn)
+
     // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
     screen.key(['escape', 'q', 'C-c'], (ch, key) => {
         screen.destroy()
@@ -126,12 +132,7 @@ require('yargs').scriptName('lenz'.magenta)
 
         // initialized ip2location db5 database
         init(argv.db)
-
-        const screen = blessed.screen()
-        const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
-
-        screen.append(map)
-        worker(map, screen, _ => {
+        setUpScreenAndRender(_ => {
             // now init-ing dht
             const dht = new DHT()
 
@@ -153,7 +154,6 @@ require('yargs').scriptName('lenz'.magenta)
             // requesting dht to lookup use provided magnet link's infoHash
             dht.lookup(infoHash)
         })
-        setUpScreenAndRender(screen)
     })
     .command('ld <domain> <db>', 'Find location of Domain Name',
         {
@@ -164,12 +164,7 @@ require('yargs').scriptName('lenz'.magenta)
             checkDomainNameValidation(argv.domain)
 
             init(argv.db)
-
-            const screen = blessed.screen()
-            const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
-
-            screen.append(map)
-            worker(map, screen, _ => {
+            setUpScreenAndRender(_ => {
                 dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
                     if (err !== undefined && err !== null) {
                         screen.destroy()
@@ -190,7 +185,6 @@ require('yargs').scriptName('lenz'.magenta)
                     console.log('Successful look up'.green)
                 })
             })
-            setUpScreenAndRender(screen)
         })
     .command('lp <ip> <db>', 'Find location of IP Address',
         {
@@ -201,12 +195,7 @@ require('yargs').scriptName('lenz'.magenta)
             checkIPAddressValidation(argv.ip)
 
             init(argv.db)
-
-            const screen = blessed.screen()
-            const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
-
-            screen.append(map)
-            worker(map, screen, _ => {
+            setUpScreenAndRender(_ => {
                 let resp = lookup(argv.ip)
                 if (validateLookup(resp)) {
                     // cached target machine IP
@@ -217,6 +206,5 @@ require('yargs').scriptName('lenz'.magenta)
 
                 console.log('Successful look up'.green)
             })
-            setUpScreenAndRender(screen)
         })
     .demandCommand().help().wrap(72).argv
