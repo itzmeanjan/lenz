@@ -12,6 +12,7 @@ require('colors')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
+const { underline } = require('colors')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -164,25 +165,24 @@ require('yargs').scriptName('lenz'.magenta)
 
             init(argv.db)
             render((map, screen) => {
-                dns.lookup(argv.domain, { all: true, verbatim: true }, (err, addrs) => {
+
+                dns.resolve4(argv.domain, (err, _addrs) => {
                     if (err !== undefined && err !== null) {
                         screen.destroy()
                         console.log('[!]Domain name look up failed'.red)
                         process.exit(0)
                     }
 
-                    addrs.forEach(v => {
-                        let resp = lookup(v.address)
-                        if (validateLookup(resp)) {
-                            // cached dns looked up address's location info
-                            markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-                            // adding dns looked up address's location onto map
-                            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
-                        }
+                    _addrs.map(v => lookup(v)).filter(v => validateLookup(v)).forEach(v => {
+                        // cached dns looked up address's location info
+                        markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
+                        // adding dns looked up address's location onto map
+                        addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                     })
 
                     console.log('Successful look up'.green)
                 })
+
             })
         })
     .command('lp <ip> <db>', 'Find location of IP Address',
