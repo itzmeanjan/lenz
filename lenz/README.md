@@ -1,6 +1,6 @@
 # lenz 🤓
 
-Console based MAP 🗺 
+Console based MAP 🗺 , with lots of features 😉 
 
 > More can be found [here](https://github.com/itzmeanjan/lenz#motivation)
 
@@ -8,7 +8,7 @@ Console based MAP 🗺
 
 We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude) for using this tool.
 
-Consider using IPv6 version, cause that will also support IPv4 lookup. This specific database, I've planned to use, is codenamed **db5**. 
+Consider using IPv6 Binary version, cause that will also support IPv4 lookup. This specific database, I've planned to use, is codenamed **db5**. 
 
 And you need to have NodeJS( >10.X ).
 
@@ -27,6 +27,7 @@ You can clone this repo in your machine & try to do installation another way.
 ```bash
 git clone git@github.com:itzmeanjan/lenz.git
 cd lenz/lenz
+npm install
 ```
 
 And install tool globally. Also make sure you've added NPM global installation path to your system **PATH** variable.
@@ -57,6 +58,8 @@ Options:
 
 Not enough non-option arguments: got 0, need at least 1
 ```
+
+Please check here for more [info](https://github.com/itzmeanjan/lenz#usage)
 
 ## contribution
 
