@@ -26,7 +26,7 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 
 We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude) for using this tool.
 
-Consider using IPv6 version, cause that will also support IPv4 lookup. This specific database I've planned to use is codenamed **db5**. 
+Consider using IPv6 Binary version, cause that will also support IPv4 lookup. This specific database I've planned to use is codenamed **db5**.
 
 Please try to stick with that, otherwise there might be some unexpected behaviours.
 
