@@ -12,7 +12,6 @@ require('colors')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
-const { underline } = require('colors')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
