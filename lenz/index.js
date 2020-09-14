@@ -9,6 +9,7 @@ const dns = require('dns')
 const isValidDomain = require('is-valid-domain')
 const DHT = require('bittorrent-dht')
 require('colors')
+const {platform} = require('os')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
@@ -118,6 +119,15 @@ const render = fn => {
     })
     // first screen render
     screen.render()
+}
+
+// checks whether platform on which this tool 
+// is being run, is either of {linux, darwin},
+// otherwise, returns false
+const checkForSupportedPlatform = _ => {
+    const plt = platform()
+
+    return plt === 'linux' || plt === 'darwin'
 }
 
 require('yargs').scriptName('lenz'.magenta)
