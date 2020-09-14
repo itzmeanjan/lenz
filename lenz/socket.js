@@ -37,10 +37,7 @@ const awk_0 = data => new Promise((resolve, reject) => {
         resolve(buffer)
     })
 
-    awk.stdin.write(data, e => {
-        if (e !== undefined || e !== null) {
-            reject(e)
-        }
+    awk.stdin.write(data, _ => {
         awk.stdin.end()
     })
 })
@@ -62,16 +59,13 @@ const awk_1 = data => new Promise((resolve, reject) => {
         resolve(buffer)
     })
 
-    awk.stdin.write(data, e => {
-        if (e !== undefined || e !== null) {
-            reject(e)
-        }
+    awk.stdin.write(data, _ => {
         awk.stdin.end()
     })
 })
 
 const getTCPAndUDPPeers = _ => new Promise((resolve, reject) => {
-    lsof().then(v => awk(v).then(v => resolve(v)).catch(reject)).catch(reject)
+    lsof().then(v => awk_0(v).then(v => awk_1(v).then(resolve).catch(reject)).catch(reject)).catch(reject)
 })
 
 module.exports = {
