@@ -86,8 +86,15 @@ const awk_2 = data => new Promise((resolve, reject) => {
     })
 })
 
+// extracts all tcp/ udp peer addresses ( ip address/ domain name/ sub-domain name )
+// to which this machine is currently talking to
+// and returns an array of them, which can be used for looking up
+// their respective location & then to be drawn on 
+// map [ which is our final objective i.e. visualization of connected socket peers on console map : lenz ]
 const getTCPAndUDPPeers = _ => new Promise((resolve, reject) => {
-    lsof().then(v => awk_0(v).then(v => awk_1(v).then(v => awk_2(v).then(resolve)
+    lsof().then(v => awk_0(v).then(v => awk_1(v).then(v => awk_2(v).then(v => {
+        resolve(v.split('\n').filter(v => v.length !== 0).map(v => v.split(':').slice(0, -1).join(':')))
+    })
         .catch(reject)).catch(reject)).catch(reject)).catch(reject)
 })
 
