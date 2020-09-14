@@ -278,18 +278,30 @@ require('yargs').scriptName('lenz'.magenta)
             init(argv.db)
             render((map, screen) => {
                 getTCPAndUDPPeers().then(v => {
-
-                    v.filter(v => isIP(v) || isValidDomain(v)).forEach(v => {
-                        let resp = lookup(v)
-                        if (validateLookup(resp)) {
-                            // cached target machine IP
-                            markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-                            // adding target machine's location into map
-                            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
+                    v.forEach(v => {
+                        if (isIP(v)) {
+                            let resp = lookup(v)
+                            if (validateLookup(resp)) {
+                                // cached target machine IP
+                                markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                                // adding target machine's location into map
+                                addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
+                            }
+                        }
+                        else if (isValidDomain(v)) {
+                            domainToIP(v).then(v => {
+                                let resp = lookup(v)
+                                if (validateLookup(resp)) {
+                                    // cached target machine IP
+                                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                                    // adding target machine's location into map
+                                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
+                                }
+                            })
                         }
                     })
-                    console.log('Successful look up'.green)
 
+                    console.log('Successful look up'.green)
                 }).catch(e => {
                     screen.destroy()
                     console.log('[!]Failed to find open socket(s)'.red)
