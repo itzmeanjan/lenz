@@ -143,7 +143,7 @@ const domainToIP = domain => new Promise((resolve, reject) => {
     // first look up ipv4 addresses for given domain name
     dns.resolve4(domain, (err, _addrs) => {
         if (err !== undefined && err !== null) {
-            reject(err.code)
+           return  reject(err.code)
         }
         addrs.push(..._addrs)
 
@@ -157,7 +157,7 @@ const domainToIP = domain => new Promise((resolve, reject) => {
                 addrs.push(...addrs)
             }
 
-            resolve(addrs)
+            return resolve(addrs)
         })
 
     })
@@ -268,7 +268,7 @@ require('yargs').scriptName('lenz'.magenta)
                 console.log('Successful look up'.green)
             })
         })
-    .command('ls <db>', 'Find location of all open TCP/ UDP socket peer(s)',
+    .command('ls <db>', 'Find location of open TCP/UDP socket peer(s)',
         {
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
         }, argv => {
@@ -281,7 +281,6 @@ require('yargs').scriptName('lenz'.magenta)
                     v.forEach(v => {
                         if (isIP(v)) {
                             let resp = lookup(v)
-                            console.log(resp)
                             if (validateLookup(resp)) {
                                 // cached target machine IP
                                 markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
@@ -299,6 +298,8 @@ require('yargs').scriptName('lenz'.magenta)
                                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                                 })
 
+                            }).catch(e => {
+                                // doing nothing as of now
                             })
                         }
                     })
