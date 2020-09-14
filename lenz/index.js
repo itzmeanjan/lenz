@@ -9,7 +9,7 @@ const dns = require('dns')
 const isValidDomain = require('is-valid-domain')
 const DHT = require('bittorrent-dht')
 require('colors')
-const {platform} = require('os')
+const { platform } = require('os')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
