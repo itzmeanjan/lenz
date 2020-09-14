@@ -10,6 +10,7 @@ const isValidDomain = require('is-valid-domain')
 const DHT = require('bittorrent-dht')
 require('colors')
 const { platform } = require('os')
+const { getTCPAndUDPPeers } = require('./socket')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
@@ -126,8 +127,12 @@ const render = fn => {
 // otherwise, returns false
 const checkForSupportedPlatform = _ => {
     const plt = platform()
+    if (plt === 'linux' || plt === 'darwin') {
+        return true
+    }
 
-    return plt === 'linux' || plt === 'darwin'
+    console.log('[!]Command not supported on platform'.red)
+    process.exit(0)
 }
 
 require('yargs').scriptName('lenz'.magenta)
@@ -180,7 +185,7 @@ require('yargs').scriptName('lenz'.magenta)
                     if (err !== undefined && err !== null) {
                         screen.destroy()
                         console.log('[!]Domain name look up failed'.red)
-                        process.exit(0)
+                        process.exit(1)
                     }
 
                     // filter out invalid addresses i.e. for which we can't 
@@ -231,6 +236,36 @@ require('yargs').scriptName('lenz'.magenta)
                     // adding target machine's location into map
                     addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                 }
+
+                console.log('Successful look up'.green)
+            })
+        })
+    .command('ls <db>', 'Find location of all open TCP/ UDP socket peer(s)',
+        {
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' }
+        }, argv => {
+            checkDB5Existance(argv.db)
+            checkForSupportedPlatform()
+
+            init(argv.db)
+            render((map, screen) => {
+                getTCPAndUDPPeers().then(v => {
+
+                    v.filter(v => isIP(v) || isValidDomain(v)).forEach(v => {
+                        let resp = lookup(v)
+                        if (validateLookup(resp)) {
+                            // cached target machine IP
+                            markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                            // adding target machine's location into map
+                            addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
+                        }
+                    })
+
+                }).catch(e => {
+                    screen.destroy()
+                    console.log('[!]Failed to find open socket(s)'.red)
+                    process.exit(1)
+                })
 
                 console.log('Successful look up'.green)
             })
