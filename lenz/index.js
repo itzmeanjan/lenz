@@ -9,6 +9,8 @@ const dns = require('dns')
 const isValidDomain = require('is-valid-domain')
 const DHT = require('bittorrent-dht')
 require('colors')
+const { platform } = require('os')
+const { getTCPAndUDPPeers } = require('./socket')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
@@ -120,6 +122,47 @@ const render = fn => {
     screen.render()
 }
 
+// checks whether platform on which this tool 
+// is being run, is either of {linux, darwin},
+// otherwise, returns false
+const checkForSupportedPlatform = _ => {
+    const plt = platform()
+    if (plt === 'linux' || plt === 'darwin') {
+        return true
+    }
+
+    console.log('[!]Command not supported on platform'.red)
+    process.exit(0)
+}
+
+// given domain name, finds out all ipv4/ 6 addresses using dns.resolve*
+// function, in case of bad domain names, promise to be rejected
+const domainToIP = domain => new Promise((resolve, reject) => {
+    const addrs = []
+
+    // first look up ipv4 addresses for given domain name
+    dns.resolve4(domain, (err, _addrs) => {
+        if (err !== undefined && err !== null) {
+           return  reject(err.code)
+        }
+        addrs.push(..._addrs)
+
+        // then go for resolving ipv6 addresses, as not
+        // all domains may support ipv6, which is why, we're
+        // going to not destroy application if case of failure here, because
+        // it's guaranteed that domain name exists if control of execution
+        // has come to this point
+        dns.resolve6(domain, (err, _addrs) => {
+            if (err === undefined || err === null) {
+                addrs.push(...addrs)
+            }
+
+            return resolve(addrs)
+        })
+
+    })
+})
+
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
@@ -170,7 +213,7 @@ require('yargs').scriptName('lenz'.magenta)
                     if (err !== undefined && err !== null) {
                         screen.destroy()
                         console.log('[!]Domain name look up failed'.red)
-                        process.exit(0)
+                        process.exit(1)
                     }
 
                     // filter out invalid addresses i.e. for which we can't 
@@ -223,6 +266,50 @@ require('yargs').scriptName('lenz'.magenta)
                 }
 
                 console.log('Successful look up'.green)
+            })
+        })
+    .command('ls <db>', 'Find location of open TCP/UDP socket peer(s)',
+        {
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' }
+        }, argv => {
+            checkDB5Existance(argv.db)
+            checkForSupportedPlatform()
+
+            init(argv.db)
+            render((map, screen) => {
+                getTCPAndUDPPeers().then(v => {
+                    v.forEach(v => {
+                        if (isIP(v)) {
+                            let resp = lookup(v)
+                            if (validateLookup(resp)) {
+                                // cached target machine IP
+                                markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                                // adding target machine's location into map
+                                addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
+                            }
+                        }
+                        else if (isValidDomain(v)) {
+                            domainToIP(v).then(v => {
+
+                                v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
+                                    // cached target machine IP
+                                    markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
+                                    // adding target machine's location into map
+                                    addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                                })
+
+                            }).catch(e => {
+                                // doing nothing as of now
+                            })
+                        }
+                    })
+
+                    console.log('Successful look up'.green)
+                }).catch(e => {
+                    screen.destroy()
+                    console.log('[!]Failed to find open socket(s)'.red)
+                    process.exit(1)
+                })
             })
         })
     .demandCommand().help().wrap(72).argv
