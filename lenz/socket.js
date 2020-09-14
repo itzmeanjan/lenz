@@ -12,9 +12,9 @@ const lsof = _ => new Promise((resolve, reject) => {
     })
     lsof.on('close', code => {
         if (code !== 0) {
-            reject(code)
+            return reject(code)
         }
-        resolve(buffer)
+        return resolve(buffer)
     })
 })
 
@@ -32,9 +32,9 @@ const awk_0 = data => new Promise((resolve, reject) => {
     })
     awk.on('close', code => {
         if (code !== 0) {
-            reject(code)
+            return reject(code)
         }
-        resolve(buffer)
+        return resolve(buffer)
     })
 
     awk.stdin.write(data, _ => {
@@ -54,9 +54,9 @@ const awk_1 = data => new Promise((resolve, reject) => {
     })
     awk.on('close', code => {
         if (code !== 0) {
-            reject(code)
+            return reject(code)
         }
-        resolve(buffer)
+        return resolve(buffer)
     })
 
     awk.stdin.write(data, _ => {
@@ -76,9 +76,9 @@ const awk_2 = data => new Promise((resolve, reject) => {
     })
     awk.on('close', code => {
         if (code !== 0) {
-            reject(code)
+            return reject(code)
         }
-        resolve(buffer)
+        return resolve(buffer)
     })
 
     awk.stdin.write(data, _ => {
@@ -94,10 +94,8 @@ const awk_2 = data => new Promise((resolve, reject) => {
 const getTCPAndUDPPeers = _ => new Promise((resolve, reject) => {
     lsof().then(v => awk_0(v)
         .then(v => awk_1(v)
-            .then(v => awk_2(v).then(v => {
-                resolve(v.split('\n').filter(v => v.length !== 0)
-                    .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')))
-            })
+            .then(v => awk_2(v).then(v => resolve(v.split('\n').filter(v => v.length !== 0)
+                .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, ''))))
                 .catch(reject)).catch(reject))
         .catch(reject)).catch(reject)
 })
