@@ -43,8 +43,8 @@ const awk_0 = data => new Promise((resolve, reject) => {
 })
 
 // another pattern extractor using awk, where we try to
-// extract out only destination machine's address ( ipv4/ 6 )
-// for each of active socket connections.
+// extract out only those addresses which are 
+// valid ip addresses either ipv4/ 6/ (sub-)domain names
 const awk_1 = data => new Promise((resolve, reject) => {
     let buffer
     const awk = spawn('awk', ['/.*->/{ print $1 }'])
@@ -64,8 +64,31 @@ const awk_1 = data => new Promise((resolve, reject) => {
     })
 })
 
+// another pattern extractor using awk, where we try to
+// extract out only destination machine's address ( ipv4/ 6 )/ domain name
+// for each of active socket connections.
+const awk_2 = data => new Promise((resolve, reject) => {
+    let buffer
+    const awk = spawn('awk', ['-F', '->', '{ print $2 }'])
+
+    awk.stdout.on('data', d => {
+        buffer = d.toString()
+    })
+    awk.on('close', code => {
+        if (code !== 0) {
+            reject(code)
+        }
+        resolve(buffer)
+    })
+
+    awk.stdin.write(data, _ => {
+        awk.stdin.end()
+    })
+})
+
 const getTCPAndUDPPeers = _ => new Promise((resolve, reject) => {
-    lsof().then(v => awk_0(v).then(v => awk_1(v).then(resolve).catch(reject)).catch(reject)).catch(reject)
+    lsof().then(v => awk_0(v).then(v => awk_1(v).then(v => awk_2(v).then(resolve)
+        .catch(reject)).catch(reject)).catch(reject)).catch(reject)
 })
 
 module.exports = {
