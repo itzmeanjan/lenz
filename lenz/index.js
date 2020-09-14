@@ -135,6 +135,34 @@ const checkForSupportedPlatform = _ => {
     process.exit(0)
 }
 
+// given domain name, finds out all ipv4/ 6 addresses using dns.resolve*
+// function, in case of bad domain names, promise to be rejected
+const domainToIP = domain => new Promise((resolve, reject) => {
+    const addrs = []
+
+    // first look up ipv4 addresses for given domain name
+    dns.resolve4(domain, (err, _addrs) => {
+        if (err !== undefined && err !== null) {
+            reject(err.code)
+        }
+        addrs.push(..._addrs)
+
+        // then go for resolving ipv6 addresses, as not
+        // all domains may support ipv6, which is why, we're
+        // going to not destroy application if case of failure here, because
+        // it's guaranteed that domain name exists if control of execution
+        // has come to this point
+        dns.resolve6(domain, (err, _addrs) => {
+            if (err === undefined || err === null) {
+                addrs.push(...addrs)
+            }
+
+            resolve(addrs)
+        })
+
+    })
+})
+
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
@@ -260,14 +288,13 @@ require('yargs').scriptName('lenz'.magenta)
                             addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                         }
                     })
+                    console.log('Successful look up'.green)
 
                 }).catch(e => {
                     screen.destroy()
                     console.log('[!]Failed to find open socket(s)'.red)
                     process.exit(1)
                 })
-
-                console.log('Successful look up'.green)
             })
         })
     .demandCommand().help().wrap(72).argv
