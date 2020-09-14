@@ -281,6 +281,7 @@ require('yargs').scriptName('lenz'.magenta)
                     v.forEach(v => {
                         if (isIP(v)) {
                             let resp = lookup(v)
+                            console.log(resp)
                             if (validateLookup(resp)) {
                                 // cached target machine IP
                                 markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
@@ -290,13 +291,14 @@ require('yargs').scriptName('lenz'.magenta)
                         }
                         else if (isValidDomain(v)) {
                             domainToIP(v).then(v => {
-                                let resp = lookup(v)
-                                if (validateLookup(resp)) {
+
+                                v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
                                     // cached target machine IP
-                                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                                    markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
                                     // adding target machine's location into map
-                                    addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
-                                }
+                                    addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                                })
+
                             })
                         }
                     })
