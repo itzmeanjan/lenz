@@ -63,13 +63,23 @@ const addMarkerAndRender = (lon, lat, color, char, map, screen) => {
 }
 
 // cache for markers to be drawn on screen
-const markers = []
+let markers = []
 // state of map, when true, is rendered with data
 // when false, canvas is cleared
 let on = true;
 // enabling flashing effect
 const enableFlashEffect = (map, screen) => {
     if (on) {
+        // only extracting out unique ip addresses
+        // it was causing an issue, when looking up
+        // active socket connections using `lsof`
+        // where multiple same remote addresses can be
+        // which is why this part is necessary
+        // it's not very expensive function, to run every 1 sec
+        //
+        // only running when we need to draw onto screen
+        markers = markers.filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+
         markers.forEach(v => {
             map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
         })
@@ -90,7 +100,7 @@ const worker = (map, screen, fn) => getMyIP().then(ip => {
     let resp = lookup(ip)
     if (validateLookup(resp)) {
         // cached host machine IP
-        markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
+        markers.push({ ...resp, color: 'red', char: 'X' })
         // adding this machine's location onto map
         addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
     }
@@ -107,7 +117,7 @@ const worker = (map, screen, fn) => getMyIP().then(ip => {
 // also to be done here i.e. whole application UI setup to be made here
 const render = fn => {
     const screen = blessed.screen()
-    const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
+    const map = contrib.map({ label: 'Searching ...', style: { shapeColor: 'cyan' } })
 
     screen.append(map)
     worker(map, screen, fn)
@@ -115,6 +125,7 @@ const render = fn => {
     // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
     screen.key(['escape', 'q', 'C-c'], (ch, key) => {
         screen.destroy()
+        logger()
         console.log('[+]Done'.green)
         process.exit(0)
     })
@@ -143,7 +154,7 @@ const domainToIP = domain => new Promise((resolve, reject) => {
     // first look up ipv4 addresses for given domain name
     dns.resolve4(domain, (err, _addrs) => {
         if (err !== undefined && err !== null) {
-           return  reject(err.code)
+            return reject(err.code)
         }
         addrs.push(..._addrs)
 
@@ -162,6 +173,16 @@ const domainToIP = domain => new Promise((resolve, reject) => {
 
     })
 })
+
+// logs all found peers ( including itself ), on console,
+// for all commands
+//
+// this section needs to be improved, by adding on-map live logging support
+const logger = _ => {
+    console.log('\n')
+    console.table(markers, ['ip', 'lon', 'lat', 'region', 'country'])
+    console.log('\n')
+}
 
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
@@ -187,7 +208,7 @@ require('yargs').scriptName('lenz'.magenta)
                 let resp = lookup(peer.host)
                 if (validateLookup(resp)) {
                     // caching peer info
-                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                    markers.push({ ...resp, color: 'magenta', char: 'o' })
                     // adding peer location in map
                     addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                 }
@@ -208,41 +229,19 @@ require('yargs').scriptName('lenz'.magenta)
             init(argv.db)
             render((map, screen) => {
 
-                // first look up ipv4 addresses for given domain name
-                dns.resolve4(argv.domain, (err, _addrs) => {
-                    if (err !== undefined && err !== null) {
-                        screen.destroy()
-                        console.log('[!]Domain name look up failed'.red)
-                        process.exit(1)
-                    }
-
-                    // filter out invalid addresses i.e. for which we can't 
-                    // seem to find valid location entry
-                    _addrs.map(v => lookup(v)).filter(v => validateLookup(v)).forEach(v => {
-                        // cached dns looked up address's location info
-                        markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
-                        // adding dns looked up address's location onto map
+                domainToIP(argv.domain).then(v => {
+                    v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
+                        // cached remote machine IP
+                        markers.push({ ...v, color: 'magenta', char: 'o' })
+                        // adding remote machine's location into map
                         addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                     })
 
-                    // then go for resolving ipv6 addresses, as not
-                    // all domains may support ipv6, which is why, we're
-                    // going to not destroy application if case of failure here, because
-                    // it's guaranteed that domain name exists if control of execution
-                    // has come to this point
-                    dns.resolve6(argv.domain, (err, _addrs) => {
-                        if (err === undefined || err === null) {
-                            _addrs.map(v => lookup(v)).filter(v => validateLookup(v)).forEach(v => {
-                                // cached dns looked up address's location info
-                                markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
-                                // adding dns looked up address's location onto map
-                                addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
-                            })
-                        }
-
-                        console.log('Successful look up'.green)
-                    })
-
+                    console.log('Successful look up'.green)
+                }).catch(e => {
+                    screen.destroy()
+                    console.log('[!]Domain name look up failed'.red)
+                    process.exit(1)
                 })
 
             })
@@ -260,7 +259,7 @@ require('yargs').scriptName('lenz'.magenta)
                 let resp = lookup(argv.ip)
                 if (validateLookup(resp)) {
                     // cached target machine IP
-                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                    markers.push({ ...resp, color: 'magenta', char: 'o' })
                     // adding target machine's location into map
                     addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                 }
@@ -273,6 +272,7 @@ require('yargs').scriptName('lenz'.magenta)
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
         }, argv => {
             checkDB5Existance(argv.db)
+            // this command is only supported in macos & gnu/linux
             checkForSupportedPlatform()
 
             init(argv.db)
@@ -282,9 +282,9 @@ require('yargs').scriptName('lenz'.magenta)
                         if (isIP(v)) {
                             let resp = lookup(v)
                             if (validateLookup(resp)) {
-                                // cached target machine IP
-                                markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-                                // adding target machine's location into map
+                                // cached remote machine IP
+                                markers.push({ ...resp, color: 'magenta', char: 'o' })
+                                // adding remote machine's location into map
                                 addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                             }
                         }
@@ -292,9 +292,9 @@ require('yargs').scriptName('lenz'.magenta)
                             domainToIP(v).then(v => {
 
                                 v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
-                                    // cached target machine IP
-                                    markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
-                                    // adding target machine's location into map
+                                    // cached remote machine IP
+                                    markers.push({ ...v, color: 'magenta', char: 'o' })
+                                    // adding remote machine's location into map
                                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                                 })
 

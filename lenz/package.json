@@ -1,7 +1,7 @@
 {
   "name": "lenz",
-  "version": "1.1.0",
-  "description": "Console based MAP 🗺",
+  "version": "1.2.0",
+  "description": "Console based MAP 🗺, with lots of features packed in 😎",
   "main": "index.js",
   "bin": {
     "lenz": "./index.js"
