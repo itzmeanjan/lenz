@@ -158,7 +158,7 @@ Options:
 Not enough non-option arguments: got 0, need at least 2
 ```
 
-### find all active TCP/UDP sockets
+### find all active TCP/UDP sockets ( ls )
 
 Finds out all active TCP/UDP socket connections & their peers, which are then shown on console map
 
