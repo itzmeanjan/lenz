@@ -2,7 +2,7 @@
 
 Console based MAP 🗺 : only **11.2 kB** of unpacked size.
 
-![sc](sc/sc_2.gif)
+![sc](sc/sc_0.gif)
 
 ## motivation
 
@@ -75,8 +75,6 @@ Now you can use `lenz` from any where in your directory tree.
 
 Invoke `lenz` from CLI, supplying proper params for each of supported commands.
 
-![sc](sc/sc_1.gif)
-
 > ❌ : Your location, using IP address
 
 > ⭕️ : Peer(s) location
@@ -105,6 +103,8 @@ Not enough non-option arguments: got 0, need at least 1
 
 Get a magnet link & supply it while invoking `lenz`
 
+![sc](sc/sc_1.gif)
+
 ```bash
 5p1d3r:lenz anjan$ lenz lm
 lenz lm <magnet> <db>
@@ -123,6 +123,8 @@ Not enough non-option arguments: got 0, need at least 2
 ### look up by domain name ( ld )
 
 Domain name to be resolved to IPv _{4,6}_ addresses & shown on console map.
+
+![sc](sc/sc_2.gif)
 
 ```bash
 5p1d3r:lenz anjan$ lenz ld
@@ -143,6 +145,8 @@ Not enough non-option arguments: got 0, need at least 2
 
 Looks up IPv _{4,6}_  address location & shows on console map.
 
+![sc](sc/sc_3.gif)
+
 ```bash
 5p1d3r:lenz anjan$ lenz lp
 lenz lp <ip> <db>
@@ -161,6 +165,8 @@ Not enough non-option arguments: got 0, need at least 2
 ### find all active TCP/UDP sockets ( ls )
 
 Finds out all active TCP/UDP socket connections & their peers, which are then shown on console map
+
+![sc](sc/sc_4.gif)
 
 > **Note** : This feature is only available on darwin & gnu/linux, as of now
 
