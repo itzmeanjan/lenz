@@ -81,6 +81,7 @@ Commands:
   lenz lm <magnet> <db>  Find peers by Torrent Infohash
   lenz ld <domain> <db>  Find location of Domain Name
   lenz lp <ip> <db>      Find location of IP Address
+  lenz ls <db>           Find location of open TCP/UDP socket peer(s)
 
 Options:
   --version  Show version number                               [boolean]
