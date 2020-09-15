@@ -107,7 +107,7 @@ const worker = (map, screen, fn) => getMyIP().then(ip => {
 // also to be done here i.e. whole application UI setup to be made here
 const render = fn => {
     const screen = blessed.screen()
-    const map = contrib.map({ label: 'World Map', style: { shapeColor: 'cyan' } })
+    const map = contrib.map({ label: 'Searching over World ...', style: { shapeColor: 'cyan' } })
 
     screen.append(map)
     worker(map, screen, fn)
@@ -143,7 +143,7 @@ const domainToIP = domain => new Promise((resolve, reject) => {
     // first look up ipv4 addresses for given domain name
     dns.resolve4(domain, (err, _addrs) => {
         if (err !== undefined && err !== null) {
-           return  reject(err.code)
+            return reject(err.code)
         }
         addrs.push(..._addrs)
 
@@ -273,6 +273,7 @@ require('yargs').scriptName('lenz'.magenta)
             db: { describe: 'path to ip2location-db5.bin', type: 'string' }
         }, argv => {
             checkDB5Existance(argv.db)
+            // this command is only supported in macos & gnu/linux
             checkForSupportedPlatform()
 
             init(argv.db)
@@ -282,9 +283,9 @@ require('yargs').scriptName('lenz'.magenta)
                         if (isIP(v)) {
                             let resp = lookup(v)
                             if (validateLookup(resp)) {
-                                // cached target machine IP
+                                // cached remote machine IP
                                 markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
-                                // adding target machine's location into map
+                                // adding remote machine's location into map
                                 addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                             }
                         }
@@ -292,9 +293,9 @@ require('yargs').scriptName('lenz'.magenta)
                             domainToIP(v).then(v => {
 
                                 v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
-                                    // cached target machine IP
+                                    // cached remote machine IP
                                     markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
-                                    // adding target machine's location into map
+                                    // adding remote machine's location into map
                                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                                 })
 
