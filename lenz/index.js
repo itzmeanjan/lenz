@@ -170,9 +170,7 @@ const domainToIP = domain => new Promise((resolve, reject) => {
 // this section needs to be improved, by adding on-map live logging support
 const logger = _ => {
     console.log('\n')
-    markers.forEach(v => {
-        console.log(`${v.ip.magenta} : ${`( ${v.lon}, ${v.lat} )`.green}, ${v.region.yellow}, ${v.country.blue}`)
-    })
+    console.table(markers, ['ip', 'lon', 'lat', 'region', 'country'])
     console.log('\n')
 }
 
