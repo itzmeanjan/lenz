@@ -2,7 +2,7 @@
 
 Console based MAP 🗺 : only **11.2 kB** of unpacked size.
 
-![sc](sc/sc_2.png)
+![sc](sc/sc_2.gif)
 
 ## motivation
 
