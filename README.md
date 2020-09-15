@@ -22,6 +22,15 @@ So I decided to write one, with all these above mentioned functionalites.
 
 I interested in extending its functionalites in coming days, if you find I'm missing certain use case, feel free to let me know/ just raise a PR.
 
+## features
+
+- Given (sub-)domain name, it can look up all associated server IPv4/6 addresses, showing them in console map 🥴
+- Given IPv4/6 address, can lookup it's location & show it in console map 🥳
+- Can find all active TCP/UDP socket connections & marks their respective peers in console map 🤩
+- Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map 🤓
+
+_In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map_
+
 ## prerequisite
 
 We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude) for using this tool.
@@ -147,6 +156,30 @@ Options:
   --db       path to ip2location-db5.bin                        [string]
 
 Not enough non-option arguments: got 0, need at least 2
+```
+
+### find all active TCP/UDP sockets
+
+Finds out all active TCP/UDP socket connections & their peers, which are then shown on console map
+
+> **Note** : This feature is only available on darwin & gnu/linux, as of now
+
+> It has runtime dependency on `lsof` & `awk`
+
+> These two tools are run as child processes of `lenz`
+
+```bash
+5p1d3r:lenz anjan$ lenz ls
+lenz ls <db>
+
+Find location of open TCP/UDP socket peer(s)
+
+Options:
+  --version  Show version number                               [boolean]
+  --help     Show help                                         [boolean]
+  --db       path to ip2location-db5.bin                        [string]
+
+Not enough non-option arguments: got 0, need at least 1
 ```
 
 ## contribution
