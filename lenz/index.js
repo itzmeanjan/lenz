@@ -187,7 +187,7 @@ require('yargs').scriptName('lenz'.magenta)
                 let resp = lookup(peer.host)
                 if (validateLookup(resp)) {
                     // caching peer info
-                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                    markers.push({ ...resp, color: 'magenta', char: 'o' })
                     // adding peer location in map
                     addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                 }
@@ -211,7 +211,7 @@ require('yargs').scriptName('lenz'.magenta)
                 domainToIP(argv.domain).then(v => {
                     v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
                         // cached remote machine IP
-                        markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
+                        markers.push({ ...resp, color: 'magenta', char: 'o' })
                         // adding remote machine's location into map
                         addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                     })
@@ -238,7 +238,7 @@ require('yargs').scriptName('lenz'.magenta)
                 let resp = lookup(argv.ip)
                 if (validateLookup(resp)) {
                     // cached target machine IP
-                    markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                    markers.push({ ...resp, color: 'magenta', char: 'o' })
                     // adding target machine's location into map
                     addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                 }
@@ -262,7 +262,7 @@ require('yargs').scriptName('lenz'.magenta)
                             let resp = lookup(v)
                             if (validateLookup(resp)) {
                                 // cached remote machine IP
-                                markers.push({ lon: resp.lon, lat: resp.lat, color: 'magenta', char: 'o' })
+                                markers.push({ ...resp, color: 'magenta', char: 'o' })
                                 // adding remote machine's location into map
                                 addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                             }
@@ -272,7 +272,7 @@ require('yargs').scriptName('lenz'.magenta)
 
                                 v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
                                     // cached remote machine IP
-                                    markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
+                                    markers.push({ ...resp, color: 'magenta', char: 'o' })
                                     // adding remote machine's location into map
                                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                                 })
