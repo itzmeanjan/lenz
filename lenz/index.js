@@ -90,7 +90,7 @@ const worker = (map, screen, fn) => getMyIP().then(ip => {
     let resp = lookup(ip)
     if (validateLookup(resp)) {
         // cached host machine IP
-        markers.push({ lon: resp.lon, lat: resp.lat, color: 'red', char: 'X' })
+        markers.push({ ...resp, color: 'red', char: 'X' })
         // adding this machine's location onto map
         addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
     }
@@ -115,6 +115,7 @@ const render = fn => {
     // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
     screen.key(['escape', 'q', 'C-c'], (ch, key) => {
         screen.destroy()
+        logger()
         console.log('[+]Done'.green)
         process.exit(0)
     })
@@ -168,9 +169,11 @@ const domainToIP = domain => new Promise((resolve, reject) => {
 //
 // this section needs to be improved, by adding on-map live logging support
 const logger = _ => {
+    console.log('\n')
     markers.forEach(v => {
-        console.log(`${v.ip} : ( ${v.lon}, ${v.lat} ), ${v.region}, ${v.country}`)
+        console.log(`${v.ip.magenta} : ${`( ${v.lon}, ${v.lat} )`.green}, ${v.region.yellow}, ${v.country.blue}`)
     })
+    console.log('\n')
 }
 
 require('yargs').scriptName('lenz'.magenta)
