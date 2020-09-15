@@ -107,7 +107,7 @@ const worker = (map, screen, fn) => getMyIP().then(ip => {
 // also to be done here i.e. whole application UI setup to be made here
 const render = fn => {
     const screen = blessed.screen()
-    const map = contrib.map({ label: 'Searching over World ...', style: { shapeColor: 'cyan' } })
+    const map = contrib.map({ label: 'Searching ...', style: { shapeColor: 'cyan' } })
 
     screen.append(map)
     worker(map, screen, fn)
