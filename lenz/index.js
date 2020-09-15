@@ -163,6 +163,16 @@ const domainToIP = domain => new Promise((resolve, reject) => {
     })
 })
 
+// logs all found peers ( including itself ), on console,
+// for all commands
+//
+// this section needs to be improved, by adding on-map live logging support
+const logger = _ => {
+    markers.forEach(v => {
+        console.log(`${v.ip} : ( ${v.lon}, ${v.lat} ), ${v.region}, ${v.country}`)
+    })
+}
+
 require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
