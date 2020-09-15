@@ -63,13 +63,23 @@ const addMarkerAndRender = (lon, lat, color, char, map, screen) => {
 }
 
 // cache for markers to be drawn on screen
-const markers = []
+let markers = []
 // state of map, when true, is rendered with data
 // when false, canvas is cleared
 let on = true;
 // enabling flashing effect
 const enableFlashEffect = (map, screen) => {
     if (on) {
+        // only extracting out unique ip addresses
+        // it was causing an issue, when looking up
+        // active socket connections using `lsof`
+        // where multiple same remote addresses can be
+        // which is why this part is necessary
+        // it's not very expensive function, to run every 1 sec
+        //
+        // only running when we need to draw onto screen
+        markers = markers.filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+
         markers.forEach(v => {
             map.addMarker({ lon: v.lon, lat: v.lat, color: v.color, char: v.char })
         })
