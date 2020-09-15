@@ -208,13 +208,15 @@ require('yargs').scriptName('lenz'.magenta)
             init(argv.db)
             render((map, screen) => {
 
-                domainToIP(v).then(v => {
+                domainToIP(argv.domain).then(v => {
                     v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
                         // cached remote machine IP
                         markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
                         // adding remote machine's location into map
                         addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                     })
+
+                    console.log('Successful look up'.green)
                 }).catch(e => {
                     screen.destroy()
                     console.log('[!]Domain name look up failed'.red)
