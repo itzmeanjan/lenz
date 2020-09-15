@@ -208,41 +208,17 @@ require('yargs').scriptName('lenz'.magenta)
             init(argv.db)
             render((map, screen) => {
 
-                // first look up ipv4 addresses for given domain name
-                dns.resolve4(argv.domain, (err, _addrs) => {
-                    if (err !== undefined && err !== null) {
-                        screen.destroy()
-                        console.log('[!]Domain name look up failed'.red)
-                        process.exit(1)
-                    }
-
-                    // filter out invalid addresses i.e. for which we can't 
-                    // seem to find valid location entry
-                    _addrs.map(v => lookup(v)).filter(v => validateLookup(v)).forEach(v => {
-                        // cached dns looked up address's location info
+                domainToIP(v).then(v => {
+                    v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
+                        // cached remote machine IP
                         markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
-                        // adding dns looked up address's location onto map
+                        // adding remote machine's location into map
                         addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                     })
-
-                    // then go for resolving ipv6 addresses, as not
-                    // all domains may support ipv6, which is why, we're
-                    // going to not destroy application if case of failure here, because
-                    // it's guaranteed that domain name exists if control of execution
-                    // has come to this point
-                    dns.resolve6(argv.domain, (err, _addrs) => {
-                        if (err === undefined || err === null) {
-                            _addrs.map(v => lookup(v)).filter(v => validateLookup(v)).forEach(v => {
-                                // cached dns looked up address's location info
-                                markers.push({ lon: v.lon, lat: v.lat, color: 'magenta', char: 'o' })
-                                // adding dns looked up address's location onto map
-                                addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
-                            })
-                        }
-
-                        console.log('Successful look up'.green)
-                    })
-
+                }).catch(e => {
+                    screen.destroy()
+                    console.log('[!]Domain name look up failed'.red)
+                    process.exit(1)
                 })
 
             })
