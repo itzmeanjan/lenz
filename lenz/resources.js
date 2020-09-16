@@ -9,9 +9,14 @@ const getHTML = url => new Promise((resolve, reject) => {
 // extract out `link` elements, which are used
 // for specifying CSS resources, used in a webpage
 const extractCSSResources = html => {
-    const $ = cheerio.load(html)
+    const buffer = []
 
-    return $('link').map((i, v) => v.attribs.href)
+    const $ = cheerio.load(html)
+    $('link').each((i, v) => {
+        buffer.push(v.attribs.href)
+    })
+
+    return buffer
 }
 
 module.exports = {
