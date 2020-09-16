@@ -372,6 +372,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                             })
 
                         })
+                        console.log('Successful look up'.green)
 
                 }).catch(_ => {
                     screen.destroy()
@@ -379,7 +380,6 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     process.exit(1)
                 })
 
-                console.log('Successful look up'.green)
             })
         })
     .demandCommand().help().wrap(72).argv
