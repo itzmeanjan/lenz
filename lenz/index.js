@@ -125,9 +125,13 @@ const render = fn => {
     // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
     screen.key(['escape', 'q', 'C-c'], (ch, key) => {
         screen.destroy()
-        logger()
-        console.log('[+]Done'.green)
-        process.exit(0)
+        logger().then(v => {
+            console.log(`${v}`.green)
+            process.exit(0)
+        }).catch(e => {
+            console.log(`${e}`.red)
+            process.exit(1)
+        })
     })
     // first screen render
     screen.render()
@@ -178,7 +182,7 @@ const domainToIP = domain => new Promise((resolve, reject) => {
 // for all commands
 //
 // this section needs to be improved, by adding on-map live logging support
-const logger = _ => {
+const logger = _ => new Promise((resolve, reject) => {
     console.log('\n')
     console.table(markers, ['ip', 'lon', 'lat', 'region', 'country'])
     console.log('\n')
@@ -197,13 +201,14 @@ const logger = _ => {
             }
         })
     }, null, '\t'), err => {
-        if (err !== undefined || err !== null) {
-            console.log('[~]Failed to dump'.red)
+        if (err) {
+            reject('[~]Failed to dump')
         } else {
-            console.log(`[+]Dumped into ${argv.dump}`.green)
+            resolve(`[+]Dumped into ${argv.dump}`)
         }
     })
-}
+})
+
 
 const argv = require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
