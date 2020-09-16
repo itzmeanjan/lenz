@@ -78,5 +78,6 @@ module.exports = {
     extractCSSResources,
     extractScriptResources,
     validateURL,
-    extractDomainNamesFromURLs
+    extractDomainNamesFromURLs,
+    mergetTwoSets
 }
