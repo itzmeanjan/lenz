@@ -61,9 +61,22 @@ const extractDomainNamesFromURLs = data => {
     return set
 }
 
+// given two sets, each having only unique domain names
+// merges them into a single one
+const mergetTwoSets = (s1, s2) => {
+    let tmp = new Set(s1.values())
+
+    for(let i of s2.values()) {
+        tmp.add(i)
+    }
+
+    return tmp
+}
+
 module.exports = {
     getHTML,
     extractCSSResources,
     extractScriptResources,
-    validateURL
+    validateURL,
+    extractDomainNamesFromURLs
 }
