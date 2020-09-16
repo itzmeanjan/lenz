@@ -6,16 +6,15 @@ const getHTML = url => new Promise((resolve, reject) => {
     axios.default.get(url).then(resp => resolve(resp.data)).catch(reject)
 })
 
-// extract out specified html element(s) from html page
-const extractElementsFromHTML = (html, element) => {
+// extract out `link` elements, which are used
+// for specifying CSS resources, used in a webpage
+const extractCSSResources = html => {
     const $ = cheerio.load(html)
 
-    $(element).each((i, v) => {
-        console.log(v)
-    })
+    return $('link').map((i, v) => v.attribs.href)
 }
 
 module.exports = {
     getHTML,
-    extractElementsFromHTML
+    extractCSSResources
 }
