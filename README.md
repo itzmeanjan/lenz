@@ -28,6 +28,7 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 - Given IPv4/6 address, can lookup it's location & show it in console map 🥳
 - Can find all active TCP/UDP socket connections & marks their respective peers in console map 🤩
 - Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map 🤓
+- Given one URL, parses HTML & extracts out all static content i.e. {`js`, `css`} delivery domains & geo locate them 😎
 
 _In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map_
 

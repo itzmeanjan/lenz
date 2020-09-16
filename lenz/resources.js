@@ -1,7 +1,6 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
-const { url } = require('inspector')
-const {URL} = require('url')
+const { URL } = require('url')
 
 // given url, fetches html content of that page
 const getHTML = url => new Promise((resolve, reject) => {
@@ -41,7 +40,7 @@ const extractScriptResources = html => {
 // given an url, checks whether this can be considered
 // as a valid url in terms of format. No liveness is checked
 const validateURL = url => {
-    try{
+    try {
         new URL(url)
         return true
     } catch {
@@ -61,9 +60,23 @@ const extractDomainNamesFromURLs = data => {
     return set
 }
 
+// given two sets, each having only unique domain names
+// merges them into a single one
+const mergetTwoSets = (s1, s2) => {
+    let tmp = new Set(s1.values())
+
+    for (let i of s2.values()) {
+        tmp.add(i)
+    }
+
+    return tmp
+}
+
 module.exports = {
     getHTML,
     extractCSSResources,
     extractScriptResources,
-    validateURL
+    validateURL,
+    extractDomainNamesFromURLs,
+    mergetTwoSets
 }
