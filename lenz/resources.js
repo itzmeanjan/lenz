@@ -1,5 +1,6 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
+const {URL} = require('url')
 
 // given url, fetches html content of that page
 const getHTML = url => new Promise((resolve, reject) => {
@@ -36,8 +37,20 @@ const extractScriptResources = html => {
     return buffer
 }
 
+// given an url, checks whether this can be considered
+// as a valid url in terms of format. No liveness is checked
+const validateURL = url => {
+    try{
+        new URL(url)
+        return true
+    } catch {
+        return false
+    }
+}
+
 module.exports = {
     getHTML,
     extractCSSResources,
-    extractScriptResources
+    extractScriptResources,
+    validateURL
 }
