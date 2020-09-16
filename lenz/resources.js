@@ -1,7 +1,6 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
-const { url } = require('inspector')
-const {URL} = require('url')
+const { URL } = require('url')
 
 // given url, fetches html content of that page
 const getHTML = url => new Promise((resolve, reject) => {
@@ -41,7 +40,7 @@ const extractScriptResources = html => {
 // given an url, checks whether this can be considered
 // as a valid url in terms of format. No liveness is checked
 const validateURL = url => {
-    try{
+    try {
         new URL(url)
         return true
     } catch {
@@ -66,7 +65,7 @@ const extractDomainNamesFromURLs = data => {
 const mergetTwoSets = (s1, s2) => {
     let tmp = new Set(s1.values())
 
-    for(let i of s2.values()) {
+    for (let i of s2.values()) {
         tmp.add(i)
     }
 

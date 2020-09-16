@@ -14,6 +14,7 @@ const { getTCPAndUDPPeers } = require('./socket')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
+const { getHTML, extractCSSResources, extractScriptResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -340,6 +341,45 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     console.log('[!]Failed to find open socket(s)'.red)
                     process.exit(1)
                 })
+            })
+        })
+    .command('lr <url> <db> [dump]', 'Locate static content delivery domain(s) used by URL',
+        {
+            url: { describe: 'inspect for finding static content delivery domain(s)', type: 'string' },
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' },
+            dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
+        }, argv => {
+            checkDB5Existance(argv.db)
+
+            init(argv.db)
+            render((map, screen) => {
+                getHTML(argv.url).then(v => {
+
+                    mergetTwoSets(extractDomainNamesFromURLs(extractCSSResources(v)),
+                        extractDomainNamesFromURLs(extractScriptResources(v))).forEach(v => {
+
+                            domainToIP(v).then(v => {
+
+                                v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
+                                    // cached remote machine IP
+                                    markers.push({ ...v, color: 'magenta', char: 'o' })
+                                    // adding remote machine's location into map
+                                    addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                                })
+
+                            }).catch(e => {
+                                // doing nothing as of now
+                            })
+
+                        })
+
+                }).catch(_ => {
+                    screen.destroy()
+                    console.log('[!]URL lookup failed'.red)
+                    process.exit(1)
+                })
+
+                console.log('Successful look up'.green)
             })
         })
     .demandCommand().help().wrap(72).argv
