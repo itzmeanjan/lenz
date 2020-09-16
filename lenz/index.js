@@ -207,9 +207,10 @@ const logger = _ => {
 
 const argv = require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
-    .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
+    .command('lm <magnet> <db> [dump]', 'Find peers by Torrent Infohash', {
         magnet: { describe: 'torrent 🧲 link', type: 'string' },
-        db: { describe: 'path to ip2location-db5.bin', type: 'string' }
+        db: { describe: 'path to ip2location-db5.bin', type: 'string' },
+        dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
     }, argv => {
         checkDB5Existance(argv.db)
         const infoHash = checkMagnetLinkValidation(argv.magnet)
@@ -239,10 +240,11 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             dht.lookup(infoHash)
         })
     })
-    .command('ld <domain> <db>', 'Find location of Domain Name',
+    .command('ld <domain> <db> [dump]', 'Find location of Domain Name',
         {
             domain: { describe: 'domain name to be looked up', type: 'string' },
-            db: { describe: 'path to ip2location-db5.bin', type: 'string' }
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' },
+            dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
             checkDB5Existance(argv.db)
             checkDomainNameValidation(argv.domain)
@@ -267,10 +269,11 @@ const argv = require('yargs').scriptName('lenz'.magenta)
 
             })
         })
-    .command('lp <ip> <db>', 'Find location of IP Address',
+    .command('lp <ip> <db> [dump]', 'Find location of IP Address',
         {
             ip: { describe: 'IP Address to be located', type: 'string' },
-            db: { describe: 'path to ip2location-db5.bin', type: 'string' }
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' },
+            dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
             checkDB5Existance(argv.db)
             checkIPAddressValidation(argv.ip)
