@@ -26,7 +26,11 @@ const extractScriptResources = html => {
 
     const $ = cheerio.load(html)
     $('script').each((i, v) => {
-        buffer.push(v.attribs.src)
+        if (v.attribs.src !== undefined) {
+            buffer.push(v.attribs.src)
+        } else if (v.attribs['data-src'] !== undefined) {
+            buffer.push(v.attribs['data-src'])
+        }
     })
 
     return buffer
