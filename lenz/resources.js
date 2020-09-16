@@ -1,5 +1,6 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
+const { url } = require('inspector')
 const {URL} = require('url')
 
 // given url, fetches html content of that page
@@ -46,6 +47,18 @@ const validateURL = url => {
     } catch {
         return false
     }
+}
+
+// given a list of url(s) i.e. either css/ script resources
+// returns a set of domain names i.e. only unique domain names to be returned
+const extractDomainNamesFromURLs = data => {
+    let set = new Set()
+
+    data.filter(validateURL).forEach(v => {
+        set.add(new URL(v).hostname)
+    })
+
+    return set
 }
 
 module.exports = {
