@@ -1,8 +1,8 @@
 # lenz 🤓
 
-Console based MAP 🗺 : only **11.2 kB** of unpacked size.
+Console based MAP 🗺, with lots of features packed in only **18.9 kB**
 
-![sc](sc/sc_0.gif)
+![sc](sc/sc_0.png)
 
 ## motivation
 
