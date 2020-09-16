@@ -7,7 +7,7 @@ const getHTML = url => new Promise((resolve, reject) => {
 })
 
 // extract out `link` elements, which are used
-// for specifying CSS resources, used in a webpage
+// for specifying CSS resources, in a webpage
 const extractCSSResources = html => {
     const buffer = []
 
@@ -19,7 +19,21 @@ const extractCSSResources = html => {
     return buffer
 }
 
+// extract out `script` elements, which are used
+// for specifying JS resources, in a webpage
+const extractScriptResources = html => {
+    const buffer = []
+
+    const $ = cheerio.load(html)
+    $('script').each((i, v) => {
+        buffer.push(v.attribs.src)
+    })
+
+    return buffer
+}
+
 module.exports = {
     getHTML,
-    extractCSSResources
+    extractCSSResources,
+    extractScriptResources
 }
