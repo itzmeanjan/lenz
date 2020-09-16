@@ -13,6 +13,8 @@ Console based MAP 🗺 , with lots of features 😉
 
 _In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map_
 
+> Now also dumps peers along with location info into JSON file, for all supported commands
+
 ## prerequisite
 
 We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude) for using this tool.
