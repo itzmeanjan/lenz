@@ -3,7 +3,7 @@
 const blessed = require('blessed')
 const contrib = require('blessed-contrib')
 const magnet = require('magnet-uri')
-const { existsSync } = require('fs')
+const { existsSync, writeFile } = require('fs')
 const { isIP } = require('net')
 const dns = require('dns')
 const isValidDomain = require('is-valid-domain')
@@ -182,9 +182,30 @@ const logger = _ => {
     console.log('\n')
     console.table(markers, ['ip', 'lon', 'lat', 'region', 'country'])
     console.log('\n')
+
+    // dumping json output to dump file
+    // where we'll put all peers
+    // which were shown on map
+    writeFile(argv.dump, JSON.stringify({
+        dump: markers.map(v => {
+            return {
+                ip: v.ip,
+                lon: v.lon,
+                lat: v.lat,
+                region: v.region,
+                country: v.country
+            }
+        })
+    }, null, '\t'), err => {
+        if (err !== undefined || err !== null) {
+            console.log('[~]Failed to dump'.red)
+        } else {
+            console.log(`[+]Dumped into ${argv.dump}`.green)
+        }
+    })
 }
 
-require('yargs').scriptName('lenz'.magenta)
+const argv = require('yargs').scriptName('lenz'.magenta)
     .usage(`${'[+]Author  :'.bgGreen} Anjan Roy < anjanroy@yandex.com >\n${'[+]Project :'.bgGreen} https://github.com/itzmeanjan/lenz`)
     .command('lm <magnet> <db>', 'Find peers by Torrent Infohash', {
         magnet: { describe: 'torrent 🧲 link', type: 'string' },
@@ -267,9 +288,10 @@ require('yargs').scriptName('lenz'.magenta)
                 console.log('Successful look up'.green)
             })
         })
-    .command('ls <db>', 'Find location of open TCP/UDP socket peer(s)',
+    .command('ls <db> [dump]', 'Find location of open TCP/UDP socket peer(s)',
         {
-            db: { describe: 'path to ip2location-db5.bin', type: 'string' }
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' },
+            dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
             checkDB5Existance(argv.db)
             // this command is only supported in macos & gnu/linux
