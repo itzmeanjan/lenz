@@ -30,7 +30,7 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 - Given IPv4/6 address, can lookup it's location & show it in console map 🥳
 - Can find all active TCP/UDP socket connections & marks their respective peers in console map 🤩
 - Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map 🤓
-- Given one URL, parses HTML & extracts out all static content i.e. {`js`, `css`} delivery domains & geo locate them 😎
+- Given any random URL, parses HTML & extracts out all static content i.e. {`*.js`, `*.css`, `image/*`} delivery domains & geo locate them 😎
 
 _In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map_
 
@@ -193,7 +193,7 @@ Not enough non-option arguments: got 0, need at least 1
 
 ### Locate static content delivery domains used in a webpage ( lr )
 
-Given any webpage URL, parses out its `script` & `link` tags, which are used for including static resources into HTML i.e. CSS & JS. If they are delivered from some domain other than this one, extract them out & then resolve those domain names into IPv4/6 addresses, which are to be geolocated using IP2Location DB5 database. They are also shown on console map.
+Given any webpage URL, parses out its `script`, `link` & `img` tags, which are used for including static resources into HTML i.e. CSS, JS & images. If they are delivered from some domain other than this one, extract them out & then resolve those domain names into IPv4/6 addresses, which are to be geolocated using IP2Location DB5 database. They are also shown on console map.
 
 ![sc](sc/sc_5.gif)
 
