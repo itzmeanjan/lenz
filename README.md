@@ -189,6 +189,29 @@ Options:
 Not enough non-option arguments: got 0, need at least 1
 ```
 
+### Locate static content delivery domains used in a webpage ( lr )
+
+Given any webpage URL, parses out its `script` & `link` tags, which are used for including static resources into HTML i.e. CSS & JS. If they are delivered from some domain other than this one, extract them out & then resolve those domain names into IPv4/6 addresses, which are to be geolocated using IP2Location DB5 database. They are also shown on console map.
+
+![sc](sc/sc_5.gif)
+
+```bash
+5p1d3r:lenz anjan$ lenz lr
+lenz lr <url> <db> [dump]
+
+Locate static content delivery domain(s) used by URL
+
+Options:
+  --version  Show version number                               [boolean]
+  --help     Show help                                         [boolean]
+  --url      inspect for finding static content delivery domain(s)
+                                                                [string]
+  --db       path to ip2location-db5.bin                        [string]
+  --dump     path to sink-file.json      [string] [default: "dump.json"]
+
+Not enough non-option arguments: got 0, need at least 2
+```
+
 ## contribution
 
 If you're interested in adding more features to this CLI tool, please raise a PR.
