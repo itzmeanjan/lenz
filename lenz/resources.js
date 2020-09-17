@@ -42,7 +42,7 @@ const extractImageResources = html => {
     const buffer = []
 
     const $ = cheerio.load(html)
-    $('script').each((i, v) => {
+    $('img').each((_, v) => {
         buffer.push(v.attribs.src)
     })
 
@@ -88,6 +88,7 @@ module.exports = {
     getHTML,
     extractCSSResources,
     extractScriptResources,
+    extractImageResources,
     validateURL,
     extractDomainNamesFromURLs,
     mergetTwoSets
