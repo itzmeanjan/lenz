@@ -37,6 +37,18 @@ const extractScriptResources = html => {
     return buffer
 }
 
+// extract out each of `img` element's `src` prop from html page
+const extractImageResources = html => {
+    const buffer = []
+
+    const $ = cheerio.load(html)
+    $('img').each((_, v) => {
+        buffer.push(v.attribs.src)
+    })
+
+    return buffer
+}
+
 // given an url, checks whether this can be considered
 // as a valid url in terms of format. No liveness is checked
 const validateURL = url => {
@@ -76,6 +88,7 @@ module.exports = {
     getHTML,
     extractCSSResources,
     extractScriptResources,
+    extractImageResources,
     validateURL,
     extractDomainNamesFromURLs,
     mergetTwoSets

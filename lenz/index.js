@@ -14,7 +14,7 @@ const { getTCPAndUDPPeers } = require('./socket')
 
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
-const { getHTML, extractCSSResources, extractScriptResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
+const { getHTML, extractCSSResources, extractScriptResources, extractImageResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -355,23 +355,24 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             render((map, screen) => {
                 getHTML(argv.url).then(v => {
 
-                    mergetTwoSets(extractDomainNamesFromURLs(extractCSSResources(v)),
-                        extractDomainNamesFromURLs(extractScriptResources(v))).forEach(v => {
+                    mergetTwoSets(extractDomainNamesFromURLs(extractImageResources(v)),
+                        mergetTwoSets(extractDomainNamesFromURLs(extractCSSResources(v)),
+                            extractDomainNamesFromURLs(extractScriptResources(v)))).forEach(v => {
 
-                            domainToIP(v).then(v => {
+                                domainToIP(v).then(v => {
 
-                                v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
-                                    // cached remote machine IP
-                                    markers.push({ ...v, color: 'magenta', char: 'o' })
-                                    // adding remote machine's location into map
-                                    addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                                    v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
+                                        // cached remote machine IP
+                                        markers.push({ ...v, color: 'magenta', char: 'o' })
+                                        // adding remote machine's location into map
+                                        addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                                    })
+
+                                }).catch(e => {
+                                    // doing nothing as of now
                                 })
 
-                            }).catch(e => {
-                                // doing nothing as of now
                             })
-
-                        })
                     console.log('Successful look up'.green)
 
                 }).catch(_ => {
