@@ -307,7 +307,21 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             checkForSupportedPlatform()
 
             init(argv.db)
-            render((map, screen) => {
+
+            const screen = blessed.screen()
+            const grid = new contrib.grid({ rows: 10, cols: 1, screen: screen })
+            const map = grid.set(0, 0, 8, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
+
+            getMyIP().then(ip => {
+                let resp = lookup(ip)
+                if (validateLookup(resp)) {
+                    // cached host machine IP
+                    markers.push({ ...resp, color: 'red', char: 'X' })
+                    // adding this machine's location onto map
+                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
+                }
+
+                // middleware to be invoked
                 getTCPAndUDPPeers().then(v => {
                     v.forEach(v => {
                         if (isIP(v)) {
@@ -341,7 +355,24 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     console.log('[!]Failed to find open socket(s)'.red)
                     process.exit(1)
                 })
+
+                // flash every .5 seconds
+                setInterval(enableFlashEffect, 500, map, screen)
             })
+
+            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
+            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
+                screen.destroy()
+                logger().then(v => {
+                    console.log(`${v}`.green)
+                    process.exit(0)
+                }).catch(e => {
+                    console.log(`${e}`.red)
+                    process.exit(1)
+                })
+            })
+            // first screen render
+            screen.render()
         })
     .command('lr <url> <db> [dump]', 'Locate static content delivery domain(s) used by URL',
         {
