@@ -309,21 +309,21 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             init(argv.db)
 
             const screen = blessed.screen()
-            const grid = new contrib.grid({ rows: 10, cols: 1, screen: screen })
-            const map = grid.set(0, 0, 8, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
-            const table = grid.set(8, 0, 2, 1, contrib.table, {
+            const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
+            const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
+            const table = grid.set(10, 0, 2, 1, contrib.table, {
                 keys: true
                 , vi: true
-                , fg: 'magenta'
-                , selectedFg: 'white'
+                , fg: 'white'
+                , selectedFg: 'magenta'
                 , selectedBg: 'black'
                 , interactive: true
                 , label: 'Connected Peer(s)'
                 , width: '100%'
                 , height: '95%'
                 , border: { type: "line", fg: "cyan" }
-                , columnSpacing: 20
-                , columnWidth: [24, 10, 10, 24, 24]
+                , columnSpacing: 10
+                , columnWidth: [36, 10, 10, 40, 30]
             })
             table.focus()
 
@@ -356,16 +356,12 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                             }
 
                             // putting peer location info onto table
-                            markers.filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
-                                .map(v => [v.ip, v.lon, v.lat, v.region, v.country]).forEach(v => {
-
-                                    table.setData({
-                                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                        data: [v]
-                                    })
-                                    setTimeout(_ => { }, 300)
-
-                                })
+                            table.setData({
+                                headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                data: markers
+                                    .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+                                    .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                            })
                         }
                         else if (isValidDomain(v)) {
                             domainToIP(v).then(v => {
@@ -378,16 +374,12 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                 })
 
                                 // putting peer location info onto table
-                                markers.filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
-                                    .map(v => [v.ip, v.lon, v.lat, v.region, v.country]).forEach(v => {
-
-                                        table.setData({
-                                            headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                            data: [v]
-                                        })
-                                        setTimeout(_ => { }, 300)
-
-                                    })
+                                table.setData({
+                                    headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                    data: markers
+                                        .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+                                        .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                                })
 
                             }).catch(e => {
                                 // doing nothing as of now
