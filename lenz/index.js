@@ -315,7 +315,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 keys: true
                 , vi: true
                 , fg: 'white'
-                , selectedFg: 'magenta'
+                , selectedFg: 'green'
                 , selectedBg: 'black'
                 , interactive: true
                 , label: 'Connected Peer(s)'
