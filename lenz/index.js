@@ -315,15 +315,15 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 keys: true
                 , vi: true
                 , fg: 'white'
-                , selectedFg: 'white'
-                , selectedBg: 'cyan'
+                , selectedFg: 'black'
+                , selectedBg: 'magenta'
                 , interactive: true
                 , label: 'Connected Peer(s)'
                 , width: '100%'
                 , height: '95%'
                 , border: { type: "line", fg: "cyan" }
-                , columnSpacing: 8
-                , columnWidth: [10, 10, 10, 10, 10]
+                , columnSpacing: 20
+                , columnWidth: [24, 10, 10, 24, 24]
             })
             table.focus()
 
@@ -332,7 +332,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 if (validateLookup(resp)) {
                     // cached host machine IP
                     markers.push({ ...resp, color: 'red', char: 'X' })
-                    
+
                     // putting this machine's location info onto table
                     table.setData({
                         headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
@@ -351,6 +351,13 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                             if (validateLookup(resp)) {
                                 // cached remote machine IP
                                 markers.push({ ...resp, color: 'magenta', char: 'o' })
+
+                                // putting this machine's location info onto table
+                                table.setData({
+                                    headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                    data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                                })
+
                                 // adding remote machine's location into map
                                 addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                             }
@@ -361,6 +368,13 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                 v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
                                     // cached remote machine IP
                                     markers.push({ ...v, color: 'magenta', char: 'o' })
+
+                                    // putting this machine's location info onto table
+                                    table.setData({
+                                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                                    })
+
                                     // adding remote machine's location into map
                                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                                 })
