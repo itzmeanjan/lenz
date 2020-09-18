@@ -319,25 +319,28 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 , selectedBg: 'cyan'
                 , interactive: true
                 , label: 'Connected Peer(s)'
-                , width: '75%'
+                , width: '100%'
                 , height: '95%'
                 , border: { type: "line", fg: "cyan" }
-                , columnSpacing: 10
-                , columnWidth: [16, 12]
+                , columnSpacing: 8
+                , columnWidth: [10, 10, 10, 10, 10]
             })
+            table.focus()
 
             getMyIP().then(ip => {
                 let resp = lookup(ip)
                 if (validateLookup(resp)) {
                     // cached host machine IP
                     markers.push({ ...resp, color: 'red', char: 'X' })
-                    // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
-
+                    
+                    // putting this machine's location info onto table
                     table.setData({
                         headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                        data: markers.map(v => { return [v.ip, v.lon, v.lat, v.region, v.country] })
+                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
                     })
+
+                    // adding this machine's location onto map
+                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
                 }
 
                 // middleware to be invoked
