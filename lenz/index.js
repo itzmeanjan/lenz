@@ -318,7 +318,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 , selectedFg: 'white'
                 , selectedBg: 'cyan'
                 , interactive: true
-                , label: 'Active Processes'
+                , label: 'Connected Peer(s)'
                 , width: '75%'
                 , height: '95%'
                 , border: { type: "line", fg: "cyan" }
@@ -333,6 +333,11 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     markers.push({ ...resp, color: 'red', char: 'X' })
                     // adding this machine's location onto map
                     addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
+
+                    table.setData({
+                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => { return [v.ip, v.lon, v.lat, v.region, v.country] })
+                    })
                 }
 
                 // middleware to be invoked
