@@ -355,13 +355,17 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                 addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                             }
 
-                            // putting this machine's location info onto table
-                            table.setData({
-                                headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                data: markers
-                                    .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
-                                    .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                            })
+                            // putting peer location info onto table
+                            markers.filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+                                .map(v => [v.ip, v.lon, v.lat, v.region, v.country]).forEach(v => {
+
+                                    table.setData({
+                                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                        data: [v]
+                                    })
+                                    setTimeout(_ => { }, 300)
+
+                                })
                         }
                         else if (isValidDomain(v)) {
                             domainToIP(v).then(v => {
@@ -374,12 +378,16 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                 })
 
                                 // putting peer location info onto table
-                                table.setData({
-                                    headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                    data: markers
-                                        .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
-                                        .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                                })
+                                markers.filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+                                    .map(v => [v.ip, v.lon, v.lat, v.region, v.country]).forEach(v => {
+
+                                        table.setData({
+                                            headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                            data: [v]
+                                        })
+                                        setTimeout(_ => { }, 300)
+
+                                    })
 
                             }).catch(e => {
                                 // doing nothing as of now
