@@ -311,6 +311,20 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             const screen = blessed.screen()
             const grid = new contrib.grid({ rows: 10, cols: 1, screen: screen })
             const map = grid.set(0, 0, 8, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
+            const table = grid.set(8, 0, 2, 1, contrib.table, {
+                keys: true
+                , vi: true
+                , fg: 'white'
+                , selectedFg: 'white'
+                , selectedBg: 'cyan'
+                , interactive: true
+                , label: 'Active Processes'
+                , width: '75%'
+                , height: '95%'
+                , border: { type: "line", fg: "cyan" }
+                , columnSpacing: 10
+                , columnWidth: [16, 12]
+            })
 
             getMyIP().then(ip => {
                 let resp = lookup(ip)
