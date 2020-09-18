@@ -314,9 +314,9 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             const table = grid.set(8, 0, 2, 1, contrib.table, {
                 keys: true
                 , vi: true
-                , fg: 'white'
-                , selectedFg: 'black'
-                , selectedBg: 'magenta'
+                , fg: 'magenta'
+                , selectedFg: 'white'
+                , selectedBg: 'black'
                 , interactive: true
                 , label: 'Connected Peer(s)'
                 , width: '100%'
