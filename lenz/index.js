@@ -351,16 +351,17 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                             if (validateLookup(resp)) {
                                 // cached remote machine IP
                                 markers.push({ ...resp, color: 'magenta', char: 'o' })
-
-                                // putting this machine's location info onto table
-                                table.setData({
-                                    headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                    data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                                })
-
                                 // adding remote machine's location into map
                                 addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                             }
+
+                            // putting this machine's location info onto table
+                            table.setData({
+                                headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                data: markers
+                                    .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+                                    .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                            })
                         }
                         else if (isValidDomain(v)) {
                             domainToIP(v).then(v => {
@@ -368,15 +369,16 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                 v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
                                     // cached remote machine IP
                                     markers.push({ ...v, color: 'magenta', char: 'o' })
-
-                                    // putting this machine's location info onto table
-                                    table.setData({
-                                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                                    })
-
                                     // adding remote machine's location into map
                                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                                })
+
+                                // putting peer location info onto table
+                                table.setData({
+                                    headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                    data: markers
+                                        .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+                                        .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
                                 })
 
                             }).catch(e => {
