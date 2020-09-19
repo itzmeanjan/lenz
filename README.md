@@ -2,7 +2,7 @@
 
 [![NPM Version](https://badgen.net/npm/v/lenz)]() [![NPM Download Count](https://badgen.net/npm/dt/lenz)]() [![Commit Count](https://badgen.net/github/commits/itzmeanjan/lenz)]()
 
-Console based MAP 🗺, with lots of features packed in only **18.9 kB**
+Console based MAP 🗺, with lots of features packed in **< 30 kB**
 
 ![sc](sc/sc_0.png)
 
