@@ -245,7 +245,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
 
         // initialized ip2location db5 database
         init(argv.db)
-        render((map, screen) => {
+        render((map, table, screen) => {
             // now init-ing dht
             const dht = new DHT()
 
@@ -278,7 +278,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             checkDomainNameValidation(argv.domain)
 
             init(argv.db)
-            render((map, screen) => {
+            render((map, table, screen) => {
 
                 domainToIP(argv.domain).then(v => {
                     v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
@@ -307,7 +307,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             checkIPAddressValidation(argv.ip)
 
             init(argv.db)
-            render((map, screen) => {
+            render((map, table, screen) => {
                 let resp = lookup(argv.ip)
                 if (validateLookup(resp)) {
                     // cached target machine IP
@@ -393,7 +393,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             checkDB5Existance(argv.db)
 
             init(argv.db)
-            render((map, screen) => {
+            render((map, table, screen) => {
                 getHTML(argv.url).then(v => {
 
                     mergetTwoSets(extractDomainNamesFromURLs(extractImageResources(v)),
