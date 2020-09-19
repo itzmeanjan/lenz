@@ -97,17 +97,24 @@ const enableFlashEffect = (map, screen) => {
 // first finds this machine's IP & draws it
 // then invokes middleware supplied
 // and enables location marker flashing mechanism
-const worker = (map, screen, fn) => getMyIP().then(ip => {
+const worker = (map, table, screen, fn) => getMyIP().then(ip => {
     let resp = lookup(ip)
     if (validateLookup(resp)) {
         // cached host machine IP
         markers.push({ ...resp, color: 'red', char: 'X' })
+
+        // putting this machine's location info onto table
+        table.setData({
+            headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+            data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+        })
+
         // adding this machine's location onto map
         addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
     }
 
     // middleware to be invoked
-    fn(map, screen)
+    fn(map, table, screen)
 
     // flash every .5 seconds
     setInterval(enableFlashEffect, 500, map, screen)
@@ -118,10 +125,25 @@ const worker = (map, screen, fn) => getMyIP().then(ip => {
 // also to be done here i.e. whole application UI setup to be made here
 const render = fn => {
     const screen = blessed.screen()
-    const map = contrib.map({ label: 'Searching ...', style: { shapeColor: 'cyan' } })
+    const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
+    const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
+    const table = grid.set(10, 0, 2, 1, contrib.table, {
+        keys: true
+        , vi: true
+        , fg: 'white'
+        , selectedFg: 'green'
+        , selectedBg: 'black'
+        , interactive: true
+        , label: 'Connected Peer(s)'
+        , width: '100%'
+        , height: '95%'
+        , border: { type: "line", fg: "cyan" }
+        , columnSpacing: 10
+        , columnWidth: [36, 10, 10, 40, 30]
+    })
+    table.focus()
 
-    screen.append(map)
-    worker(map, screen, fn)
+    worker(map, table, screen, fn)
 
     // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
     screen.key(['escape', 'q', 'C-c'], (ch, key) => {
@@ -308,41 +330,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
 
             init(argv.db)
 
-            const screen = blessed.screen()
-            const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
-            const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
-            const table = grid.set(10, 0, 2, 1, contrib.table, {
-                keys: true
-                , vi: true
-                , fg: 'white'
-                , selectedFg: 'green'
-                , selectedBg: 'black'
-                , interactive: true
-                , label: 'Connected Peer(s)'
-                , width: '100%'
-                , height: '95%'
-                , border: { type: "line", fg: "cyan" }
-                , columnSpacing: 10
-                , columnWidth: [36, 10, 10, 40, 30]
-            })
-            table.focus()
-
-            getMyIP().then(ip => {
-                let resp = lookup(ip)
-                if (validateLookup(resp)) {
-                    // cached host machine IP
-                    markers.push({ ...resp, color: 'red', char: 'X' })
-
-                    // putting this machine's location info onto table
-                    table.setData({
-                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                    })
-
-                    // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
-                }
-
+            render((map, table, screen) => {
                 // middleware to be invoked
                 getTCPAndUDPPeers().then(v => {
                     v.forEach(v => {
@@ -381,36 +369,20 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                         .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
                                 })
 
-                            }).catch(e => {
+                            }).catch(_ => {
                                 // doing nothing as of now
                             })
                         }
                     })
 
                     console.log('Successful look up'.green)
-                }).catch(e => {
+                }).catch(_ => {
                     screen.destroy()
                     console.log('[!]Failed to find open socket(s)'.red)
                     process.exit(1)
                 })
-
-                // flash every .5 seconds
-                setInterval(enableFlashEffect, 500, map, screen)
             })
 
-            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
-                screen.destroy()
-                logger().then(v => {
-                    console.log(`${v}`.green)
-                    process.exit(0)
-                }).catch(e => {
-                    console.log(`${e}`.red)
-                    process.exit(1)
-                })
-            })
-            // first screen render
-            screen.render()
         })
     .command('lr <url> <db> [dump]', 'Locate static content delivery domain(s) used by URL',
         {
