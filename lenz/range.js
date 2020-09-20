@@ -14,6 +14,7 @@ class IPv4Range {
     }
 
     // generate all ipv4 addresses as lazy stream, within this range
+    // along with their geo location information
     *all() {
         for (let cur = this.from; cur <= this.to; cur++) {
             yield this.glass(Address4.fromInteger(cur).address)
