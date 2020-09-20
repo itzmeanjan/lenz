@@ -6,6 +6,14 @@ Console based MAP 🗺, with lots of features packed in **< 30 kB**
 
 ![sc](sc/sc_0.png)
 
+## Table of Contents
+
+- [Why did you write this software ?](#motivation)
+- [What's in box ?](#features)
+- [What do I need to use it ?](#prerequisite)
+- [How do I install it ?](#installation)
+- [How do I use it ?](#usage)
+
 ## motivation
 
 I was looking for one fully console based location data visualiser, with below functionalities 
