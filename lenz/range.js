@@ -6,4 +6,11 @@ class IPv4Range {
         this.to = to
     }
 
+    // generate all ipv4 addresses as lazy stream, within this range
+    all() {
+        for (let cur = this.from; cur <= this.to; cur++) {
+            yield cur
+        }
+    }
+
 }
