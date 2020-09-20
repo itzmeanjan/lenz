@@ -40,7 +40,7 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 - Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map 🤓
 - Given any random URL, parses HTML & extracts out all static content i.e. {`*.js`, `*.css`, `image/*`} delivery domains & geo locate them 😎
 
-_In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map_
+In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map
 
 ## prerequisite
 
@@ -56,7 +56,7 @@ And we need to have NodeJS( >10.X ).
 
 ### using NPM
 
-[This](https://www.npmjs.com/package/lenz) software is distributed using NPM.
+This [software](https://www.npmjs.com/package/lenz) is distributed using NPM.
 
 ```bash
 npm i -g lenz
