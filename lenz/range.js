@@ -9,10 +9,14 @@ class IPv4Range {
     }
 
     // generate all ipv4 addresses as lazy stream, within this range
-    all() {
+    *all() {
         for (let cur = this.from; cur <= this.to; cur++) {
-            yield Address4.fromInteger(i).address
+            yield Address4.fromInteger(cur).address
         }
     }
 
+}
+
+module.exports = {
+    IPv4Range
 }
