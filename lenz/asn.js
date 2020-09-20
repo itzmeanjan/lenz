@@ -6,12 +6,21 @@ const { resolve } = require('path')
 // of all those ipv4 address ranges, which are controlled & owned by
 // this ASN
 const findByASN = (db, asn) => new Promise((res, rej) => {
-    createInterface({
+    const buffer = []
+    let reader = createInterface({
         input: createReadStream(resolve(db)),
         output: process.stdout,
         terminal: false
-    }).addListener('line', ln => {
-        console.log(ln.split(','))
+    })
+
+    reader.on('line', ln => {
+        const record = ln.split(',').map(v => v.slice(1, -1))
+        if (record[3] === asn) {
+            buffer.push([...record.slice(0, 2), ...record.slice(3)])
+        }
+    })
+    reader.on('close', _ => {
+        res(buffer)
     })
 })
 
