@@ -36,16 +36,21 @@ const geoIPFromASN = (db, asn, glass) => new Promise((res, rej) => {
 
     findByASN(db, asn, glass).then(v => {
         v.map(v => v[0]).forEach(v => {
+
             for (let i of v.all()) {
+                if (buffer.some(v => v.lat === i.lat && v.lon === i.lon)) {
+                    continue
+                }
+
                 buffer.push(i)
             }
+
         })
 
         res({
             asn: v[0][2],
             as: v[0][1],
             ip: buffer
-                .filter((v, i, a) => i === a.findIndex(t => t.lon === v.lon && t.lat === v.lat))
         })
     }).catch(rej)
 })
