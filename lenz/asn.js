@@ -1,17 +1,17 @@
-const { readFile } = require('fs')
+const { createReadStream } = require('fs')
+const { createInterface } = require('readline')
 const { resolve } = require('path')
 
+// Given ASN & ip2location asn database, returns a list 
+// of all those ipv4 address ranges, which are controlled & owned by
+// this ASN
 const findByASN = (db, asn) => new Promise((res, rej) => {
-    readFile(resolve(db), (err, data) => {
-        if (err) {
-            rej(err)
-        }
-
-        res(data.toString()
-            .split('\n')
-            .map(v => v.split(','))
-            .filter(v => v[3] === asn)
-            .map(v => [v[0], v[1], v[3], v[4]]))
+    createInterface({
+        input: createReadStream(resolve(db)),
+        output: process.stdout,
+        terminal: false
+    }).addListener('line', ln => {
+        console.log(ln.split(','))
     })
 })
 
