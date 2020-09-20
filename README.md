@@ -16,19 +16,17 @@ Console based MAP 🗺, with lots of features packed in **< 30 kB**
 
 ## motivation
 
-I was looking for one fully console based location data visualiser, with below functionalities 
+I was looking for one fully console based geo location data visualiser, with below functionalities 
 
-- can show machine's connected peers 👩‍💻
-- can look up given IP Address location
-- can look up given (sub-)domain name location
-- can show peers, given torrent 🧲 link
+- can geo locate machine's connected TCP/ UDP peers 👩‍💻
+- can geo locate any IP Address
+- can geo locate all IPv{4,6} addresses, resolvable from (sub-)domain name
+- can geo locate peers, given torrent 🧲 link
 - _can show my own location on Map_ 🙋
 
-which can be invoked in fully console based environments i.e. VM, VPS etc.
+which can be used in fully console based environments i.e. ssh-ing into VM, VPS etc.
 
-But couldn't find one, may be I required to try harder. 
-
-So I decided to write one, with all these above mentioned functionalites.
+But couldn't find one, may be I required to try harder. So I decided to write one, with all these above mentioned functionalites.
 
 I interested in extending its functionalites in coming days, if you find I'm missing certain use case, feel free to let me know/ just raise a PR.
 
