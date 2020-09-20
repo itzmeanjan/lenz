@@ -35,20 +35,21 @@ const geoIPFromASN = (db, asn, glass) => new Promise((res, rej) => {
     const buffer = []
 
     findByASN(db, asn, glass).then(v => {
-        v.map(v => v[0].all).forEach(v => {
-            for(let i of v()) {
+        v.map(v => v[0]).forEach(v => {
+            for (let i of v.all()) {
                 buffer.push(i)
             }
         })
 
         res({
             asn: v[0][2],
-            as: v[0][3],
+            as: v[0][1],
             ip: buffer
+                .filter((v, i, a) => i === a.findIndex(t => t.lon === v.lon && t.lat === v.lat))
         })
     }).catch(rej)
 })
 
 module.exports = {
-    findByASN
+    geoIPFromASN
 }
