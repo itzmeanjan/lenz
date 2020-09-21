@@ -527,13 +527,10 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
             screen.key(['escape', 'q', 'C-c'], (ch, key) => {
                 screen.destroy()
-                logger().then(v => {
-                    console.log(`${v}`.green)
-                    process.exit(0)
-                }).catch(e => {
-                    console.log(`${e}`.red)
-                    process.exit(1)
-                })
+                console.log('\n')
+                console.table(markers, ['ip', 'lon', 'lat', 'region', 'country'])
+                console.log('\n')
+                process.exit(0)
             })
             // first screen render
             screen.render()
