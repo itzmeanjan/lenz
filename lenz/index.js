@@ -499,14 +499,22 @@ const argv = require('yargs').scriptName('lenz'.magenta)
 
             const worker = new Worker('./worker.js', { workerData: { db: argv.db, asndb: argv.asndb, asn: argv.asn } })
             worker.on('message', m => {
-                markers.push({ ...m, color: 'red', char: 'X' })
+                if (m.self) {
+                    markers.push({ ...m, color: 'red', char: 'X' })
+                } else {
+                    markers.push({ ...m, color: 'magenta', char: 'o' })
+                }
 
                 table.setData({
                     headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
                     data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
                 })
 
-                addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
+                if (m.self) {
+                    addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
+                } else {
+                    addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
+                }
             })
             worker.on('error', e => {
                 if (e) {
