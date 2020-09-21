@@ -487,64 +487,6 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             })
             table.focus()
 
-            if (isMainThread) {
-                const worker = new Worker(__filename)
-
-                worker.on('message', m => { })
-                worker.on('error', e => { })
-                worker.on('exit', c => {
-                    if (c != 0) {
-                        screen.destroy()
-                        console.log('[!]Data provider died'.red)
-                        process.exit(0)
-                    }
-                })
-            } else {
-
-            }
-
-            getMyIP().then(ip => {
-                let resp = lookup(ip)
-                if (validateLookup(resp)) {
-                    // cached host machine IP
-                    markers.push({ ...resp, color: 'red', char: 'X' })
-
-                    // putting this machine's location info onto table
-                    table.setData({
-                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                    })
-
-                    // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
-                }
-
-                const listener = geoIPFromASN(argv.asndb, argv.asn, lookup)
-                listener.on('ip', v => {
-                    markers.push({ ...v, color: 'magenta', char: 'o' })
-
-                    table.setData({
-                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                    })
-
-                    addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
-                })
-                listener.once('asn', v => {
-                    // just doing nothing as of now
-                    console.log('Successful look up'.green)
-                })
-                listener.on('error', e => {
-                    screen.destroy()
-                    console.log(`${e}`.red)
-                    process.exit(0)
-                })
-
-
-                // flash every .5 seconds
-                setInterval(enableFlashEffect, 500, map, screen)
-            })
-
             // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
             screen.key(['escape', 'q', 'C-c'], (ch, key) => {
                 screen.destroy()
@@ -555,5 +497,55 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             })
             // first screen render
             screen.render()
+            // flash every .5 seconds
+            setInterval(enableFlashEffect, 500, map, screen)
+
+            if (isMainThread) {
+                const worker = new Worker(__filename)
+
+                worker.on('message', m => {
+                    markers.push({ ...m, color: 'red', char: 'X' })
+
+                    table.setData({
+                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                    })
+
+                    addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
+                })
+                worker.on('error', e => {
+                    if (e) {
+                        screen.destroy()
+                        console.log(`${e}`.red)
+                        process.exit(1)
+                    }
+                })
+                worker.on('exit', c => {
+                    if (c != 0) {
+                        screen.destroy()
+                        console.log('[!]Abnormal death of data provider'.red)
+                        process.exit(1)
+                    }
+                })
+            } else {
+                getMyIP().then(ip => {
+                    let resp = lookup(ip)
+                    if (validateLookup(resp)) {
+                        parentPort.postMessage(resp)
+                    }
+
+                    const listener = geoIPFromASN(argv.asndb, argv.asn, lookup)
+                    listener.on('ip', v => {
+                        parentPort.postMessage(v)
+                    })
+                    listener.once('asn', v => {
+                        // just doing nothing as of now
+                        //console.log('Successful look up'.green)
+                    })
+                    listener.on('error', e => {
+                        throw new Error(e)
+                    })
+                })
+            }
         })
     .demandCommand().help().wrap(72).argv
