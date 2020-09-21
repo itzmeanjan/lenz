@@ -15,7 +15,7 @@ const { getTCPAndUDPPeers } = require('./socket')
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
 const { getHTML, extractCSSResources, extractScriptResources, extractImageResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
-const { geoIPFromASN } = require('./asn')
+const { Worker } = require('worker_threads')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -465,8 +465,6 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             checkDB5Existance(argv.db)
             checkDB5Existance(argv.asndb)
 
-            init(argv.db)
-
             const screen = blessed.screen()
             const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
             const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
@@ -486,48 +484,6 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             })
             table.focus()
 
-            getMyIP().then(ip => {
-                let resp = lookup(ip)
-                if (validateLookup(resp)) {
-                    // cached host machine IP
-                    markers.push({ ...resp, color: 'red', char: 'X' })
-
-                    // putting this machine's location info onto table
-                    table.setData({
-                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                    })
-
-                    // adding this machine's location onto map
-                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
-                }
-
-                const listener = geoIPFromASN(argv.asndb, argv.asn, lookup)
-                listener.on('ip', v => {
-                    markers.push({ ...v, color: 'magenta', char: 'o' })
-
-                    table.setData({
-                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                    })
-
-                    addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
-                })
-                listener.once('asn', v => {
-                    // just doing nothing as of now
-                    console.log('Successful look up'.green)
-                })
-                listener.on('error', e => {
-                    screen.destroy()
-                    console.log(`${e}`.red)
-                    process.exit(0)
-                })
-
-
-                // flash every .5 seconds
-                setInterval(enableFlashEffect, 500, map, screen)
-            })
-
             // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
             screen.key(['escape', 'q', 'C-c'], (ch, key) => {
                 screen.destroy()
@@ -538,5 +494,43 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             })
             // first screen render
             screen.render()
+            // flash every .5 seconds
+            setInterval(enableFlashEffect, 500, map, screen)
+
+            const worker = new Worker('./worker.js', { workerData: { db: argv.db, asndb: argv.asndb, asn: argv.asn } })
+            worker.on('message', m => {
+                if (m.self) {
+                    markers.push({ ...m, color: 'red', char: 'x' })
+                } else {
+                    markers.push({ ...m, color: 'magenta', char: 'o' })
+                }
+
+                table.setData({
+                    headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                    data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                })
+
+                if (m.self) {
+                    addMarkerAndRender(m.lon, m.lat, 'red', 'x', map, screen)
+                } else {
+                    addMarkerAndRender(m.lon, m.lat, 'magenta', 'o', map, screen)
+                }
+            })
+            worker.on('error', e => {
+                if (e) {
+                    screen.destroy()
+                    console.log(`${e}`.red)
+                    process.exit(1)
+                }
+            })
+            worker.on('exit', c => {
+                if (c != 0) {
+                    screen.destroy()
+                    console.log('[!]Abnormal death of data provider'.red)
+                    process.exit(1)
+                } else {
+                    console.log('Successful look up'.green)
+                }
+            })
         })
     .demandCommand().help().wrap(72).argv
