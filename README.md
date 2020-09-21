@@ -49,6 +49,9 @@ Consider using IPv6 Binary version, cause that will also support IPv4 lookup. Th
 
 Please try to stick with that, otherwise there might be some unexpected behaviours.
 
+We'll also need [IP2Location™ LITE IP-ASN Database](https://lite.ip2location.com/database/ip-asn) for using `la` command. See [below](#geo-locate-ipv4-addresses-owned-by-some-autonomous-system--la-).
+  - Please use IPv4 version of ASN Database
+
 And we need to have NodeJS( >10.X ).
 
 ## installation
@@ -229,6 +232,7 @@ For using this command we need two IP2Location database
 
 - [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude)
 - [IP2Location™ LITE IP-ASN Database](https://lite.ip2location.com/database/ip-asn)
+  - Please use IPv4 version of database
 
 ```bash
 5p1d3r:lenz anjan$ lenz la
