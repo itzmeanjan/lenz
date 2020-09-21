@@ -234,6 +234,8 @@ For using this command we need two IP2Location database
 - [IP2Location™ LITE IP-ASN Database](https://lite.ip2location.com/database/ip-asn)
   - Please use IPv4 version of database
 
+![sc](sc/sc_6.gif)
+
 ```bash
 5p1d3r:lenz anjan$ lenz la
 lenz la <asn> <db> <asndb>
