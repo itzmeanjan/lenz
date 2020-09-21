@@ -32,13 +32,11 @@ const findByASN = (db, asn, glass) => new Promise((res, rej) => {
 // Given ip2location asn database file path, asn to searched & function
 // to lookup geolocation of ip address, we can find out all geolocation
 // of ip addresses, handled by this ASN
-const geoIPFromASN = (db, asn, glass) => new Promise((res, rej) => {
+const geoIPFromASN = (db, asn, glass) => {
     const bridge = new EventEmitter()
     const buffer = []
 
     findByASN(db, asn, glass).then(v => {
-        res(bridge)
-
         v.map(v => v[0]).forEach(v => {
 
             for (let i of v.all()) {
@@ -52,8 +50,10 @@ const geoIPFromASN = (db, asn, glass) => new Promise((res, rej) => {
 
         })
         bridge.emit('asn', { asn: v[0][2], as: v[0][1] })
-    }).catch(rej)
-})
+    }).catch(e => {
+        bridge.emit('error', e)
+    })
+}
 
 module.exports = {
     geoIPFromASN
