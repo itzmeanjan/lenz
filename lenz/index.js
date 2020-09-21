@@ -31,7 +31,7 @@ const checkMagnetLinkValidation = _magnet => {
 // if not present, exit process with return code 1
 const checkDB5Existance = db => {
     if (!existsSync(db)) {
-        console.log('[!]Can\'t find IP2Location DB5'.red)
+        console.log('[!]Can\'t find IP2Location Database'.red)
         process.exit(1)
     }
 }
@@ -462,46 +462,64 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             asndb: { describe: 'path to ip2location-ipv4-asn.db', type: 'string' }
         }, argv => {
             checkDB5Existance(argv.db)
+            checkDB5Existance(argv.asndb)
 
             init(argv.db)
-            render((map, table, screen) => {
-                getHTML(argv.url).then(v => {
 
-                    mergetTwoSets(extractDomainNamesFromURLs(extractImageResources(v)),
-                        mergetTwoSets(extractDomainNamesFromURLs(extractCSSResources(v)),
-                            extractDomainNamesFromURLs(extractScriptResources(v)))).forEach(v => {
+            const screen = blessed.screen()
+            const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
+            const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
+            const table = grid.set(10, 0, 2, 1, contrib.table, {
+                keys: true
+                , vi: true
+                , fg: 'white'
+                , selectedFg: 'green'
+                , selectedBg: 'black'
+                , interactive: true
+                , label: 'Connected Peer(s)'
+                , width: '100%'
+                , height: '95%'
+                , border: { type: "line", fg: "cyan" }
+                , columnSpacing: 10
+                , columnWidth: [36, 10, 10, 40, 30]
+            })
+            table.focus()
 
-                                domainToIP(v).then(v => {
+            getMyIP().then(ip => {
+                let resp = lookup(ip)
+                if (validateLookup(resp)) {
+                    // cached host machine IP
+                    markers.push({ ...resp, color: 'red', char: 'X' })
 
-                                    v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
-                                        // cached remote machine IP
-                                        markers.push({ ...v, color: 'magenta', char: 'o' })
+                    // putting this machine's location info onto table
+                    table.setData({
+                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                    })
 
-                                        // putting peer location info onto table
-                                        table.setData({
-                                            headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                            data: markers
-                                                .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
-                                                .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                                        })
+                    // adding this machine's location onto map
+                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
+                }
 
-                                        // adding remote machine's location into map
-                                        addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
-                                    })
+                // middleware to be invoked
+                //fn(map, table, screen)
 
-                                }).catch(e => {
-                                    // doing nothing as of now
-                                })
+                // flash every .5 seconds
+                setInterval(enableFlashEffect, 500, map, screen)
+            })
 
-                            })
-                    console.log('Successful look up'.green)
-
-                }).catch(_ => {
-                    screen.destroy()
-                    console.log('[!]URL lookup failed'.red)
+            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
+            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
+                screen.destroy()
+                logger().then(v => {
+                    console.log(`${v}`.green)
+                    process.exit(0)
+                }).catch(e => {
+                    console.log(`${e}`.red)
                     process.exit(1)
                 })
-
             })
+            // first screen render
+            screen.render()
         })
     .demandCommand().help().wrap(72).argv
