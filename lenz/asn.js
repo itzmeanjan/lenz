@@ -1,7 +1,7 @@
 const { createReadStream } = require('fs')
 const { createInterface } = require('readline')
 const { resolve } = require('path')
-const {EventEmitter} = require('events')
+const { EventEmitter } = require('events')
 const { IPv4Range } = require('./range')
 
 // Given ASN & ip2location asn database, returns a list 
@@ -51,12 +51,7 @@ const geoIPFromASN = (db, asn, glass) => new Promise((res, rej) => {
             }
 
         })
-
-        res({
-            asn: v[0][2],
-            as: v[0][1],
-            ip: buffer
-        })
+        bridge.emit('asn', { asn: v[0][2], as: v[0][1] })
     }).catch(rej)
 })
 
