@@ -53,6 +53,8 @@ const geoIPFromASN = (db, asn, glass) => {
     }).catch(e => {
         bridge.emit('error', e)
     })
+
+    return bridge
 }
 
 module.exports = {
