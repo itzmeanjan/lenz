@@ -13,6 +13,7 @@ Console based MAP 🗺, with lots of features packed in **< 30 kB**
 - [What do I need to use it ?](#prerequisite)
 - [How do I install it ?](#installation)
 - [How do I use it ?](#usage)
+- [Can I add one new feature ?](#contribution)
 
 ## motivation
 
