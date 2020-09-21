@@ -15,6 +15,7 @@ const { getTCPAndUDPPeers } = require('./socket')
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
 const { getHTML, extractCSSResources, extractScriptResources, extractImageResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
+const { geoIPFromASN } = require('./asn')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -503,6 +504,21 @@ const argv = require('yargs').scriptName('lenz'.magenta)
 
                 // middleware to be invoked
                 //fn(map, table, screen)
+                const listener = geoIPFromASN(argv.asndb, argv.asn, lookup)
+                listener.on('ip', v => {
+                    markers.push({ ...v, color: 'magenta', char: 'o' })
+
+                    addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                })
+                listener.once('asn', v => {
+                    // just doing nothing as of now
+                })
+                listener.on('error', e => {
+                    screen.destroy()
+                    console.log(`${e}`.red)
+                    process.exit(0)
+                })
+
 
                 // flash every .5 seconds
                 setInterval(enableFlashEffect, 500, map, screen)
