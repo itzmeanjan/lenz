@@ -1,6 +1,7 @@
 const { createReadStream } = require('fs')
 const { createInterface } = require('readline')
 const { resolve } = require('path')
+const {EventEmitter} = require('events')
 const { IPv4Range } = require('./range')
 
 // Given ASN & ip2location asn database, returns a list 
@@ -32,9 +33,12 @@ const findByASN = (db, asn, glass) => new Promise((res, rej) => {
 // to lookup geolocation of ip address, we can find out all geolocation
 // of ip addresses, handled by this ASN
 const geoIPFromASN = (db, asn, glass) => new Promise((res, rej) => {
+    const bridge = new EventEmitter()
     const buffer = []
 
     findByASN(db, asn, glass).then(v => {
+        res(bridge)
+
         v.map(v => v[0]).forEach(v => {
 
             for (let i of v.all()) {
@@ -42,6 +46,7 @@ const geoIPFromASN = (db, asn, glass) => new Promise((res, rej) => {
                     continue
                 }
 
+                bridge.emit('ip', i)
                 buffer.push(i)
             }
 
