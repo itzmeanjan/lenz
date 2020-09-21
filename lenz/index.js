@@ -15,6 +15,7 @@ const { getTCPAndUDPPeers } = require('./socket')
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
 const { getHTML, extractCSSResources, extractScriptResources, extractImageResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
+const { geoIPFromASN } = require('./asn')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -31,7 +32,7 @@ const checkMagnetLinkValidation = _magnet => {
 // if not present, exit process with return code 1
 const checkDB5Existance = db => {
     if (!existsSync(db)) {
-        console.log('[!]Can\'t find IP2Location DB5'.red)
+        console.log('[!]Can\'t find IP2Location Database'.red)
         process.exit(1)
     }
 }
@@ -340,7 +341,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 console.log('Successful look up'.green)
             })
         })
-    .command('ls <db> [dump]', 'Find location of open TCP/UDP socket peer(s)',
+    .command('ls <db> [dump]', 'Find location of connected TCP/UDP socket peer(s)',
         {
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
@@ -454,5 +455,88 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 })
 
             })
+        })
+    .command('la <asn> <db> <asndb>', 'Geo locate IPv4 addresses owned by Autonomous System',
+        {
+            asn: { describe: 'autonomous system number to be looked up', type: 'int' },
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' },
+            asndb: { describe: 'path to ip2location-ipv4-asn.db', type: 'string' }
+        }, argv => {
+            checkDB5Existance(argv.db)
+            checkDB5Existance(argv.asndb)
+
+            init(argv.db)
+
+            const screen = blessed.screen()
+            const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
+            const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
+            const table = grid.set(10, 0, 2, 1, contrib.table, {
+                keys: true
+                , vi: true
+                , fg: 'white'
+                , selectedFg: 'green'
+                , selectedBg: 'black'
+                , interactive: true
+                , label: 'Connected Peer(s)'
+                , width: '100%'
+                , height: '95%'
+                , border: { type: "line", fg: "cyan" }
+                , columnSpacing: 10
+                , columnWidth: [36, 10, 10, 40, 30]
+            })
+            table.focus()
+
+            getMyIP().then(ip => {
+                let resp = lookup(ip)
+                if (validateLookup(resp)) {
+                    // cached host machine IP
+                    markers.push({ ...resp, color: 'red', char: 'X' })
+
+                    // putting this machine's location info onto table
+                    table.setData({
+                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                    })
+
+                    // adding this machine's location onto map
+                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
+                }
+
+                const listener = geoIPFromASN(argv.asndb, argv.asn, lookup)
+                listener.on('ip', v => {
+                    markers.push({ ...v, color: 'magenta', char: 'o' })
+
+                    table.setData({
+                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                    })
+
+                    addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                })
+                listener.once('asn', v => {
+                    // just doing nothing as of now
+                    console.log('Successful look up'.green)
+                })
+                listener.on('error', e => {
+                    screen.destroy()
+                    console.log(`${e}`.red)
+                    process.exit(0)
+                })
+
+
+                // flash every .5 seconds
+                setInterval(enableFlashEffect, 500, map, screen)
+            })
+
+            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
+            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
+                screen.destroy()
+                console.log('\n')
+                console.table(markers, ['ip', 'lon', 'lat', 'region', 'country'])
+                console.log('\n')
+                process.exit(0)
+            })
+            // first screen render
+            screen.render()
         })
     .demandCommand().help().wrap(72).argv
