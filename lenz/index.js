@@ -513,7 +513,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 if (m.self) {
                     addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
                 } else {
-                    addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
+                    addMarkerAndRender(m.lon, m.lat, 'magenta', 'o', map, screen)
                 }
             })
             worker.on('error', e => {
