@@ -528,6 +528,8 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     screen.destroy()
                     console.log('[!]Abnormal death of data provider'.red)
                     process.exit(1)
+                } else {
+                    console.log('Successful look up')
                 }
             })
         })
