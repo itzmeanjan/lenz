@@ -225,6 +225,11 @@ Not enough non-option arguments: got 0, need at least 2
 
 Given Autonomous System Number [ `ASN` ] of a certain organization, finds all IPv4 address ranges controlled by `ASN`, and geo locate them using IP2Location DB5 database, which are to be shown on console map.
 
+For using this command we need two IP2Location database
+
+- [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude)
+- [IP2Location™ LITE IP-ASN Database](https://lite.ip2location.com/database/ip-asn)
+
 ```bash
 5p1d3r:lenz anjan$ lenz la
 lenz la <asn> <db> <asndb>
