@@ -340,7 +340,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 console.log('Successful look up'.green)
             })
         })
-    .command('ls <db> [dump]', 'Find location of open TCP/UDP socket peer(s)',
+    .command('ls <db> [dump]', 'Find location of connected TCP/UDP socket peer(s)',
         {
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
@@ -411,6 +411,55 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             url: { describe: 'inspect for finding static content delivery domain(s)', type: 'string' },
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
+        }, argv => {
+            checkDB5Existance(argv.db)
+
+            init(argv.db)
+            render((map, table, screen) => {
+                getHTML(argv.url).then(v => {
+
+                    mergetTwoSets(extractDomainNamesFromURLs(extractImageResources(v)),
+                        mergetTwoSets(extractDomainNamesFromURLs(extractCSSResources(v)),
+                            extractDomainNamesFromURLs(extractScriptResources(v)))).forEach(v => {
+
+                                domainToIP(v).then(v => {
+
+                                    v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
+                                        // cached remote machine IP
+                                        markers.push({ ...v, color: 'magenta', char: 'o' })
+
+                                        // putting peer location info onto table
+                                        table.setData({
+                                            headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                            data: markers
+                                                .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
+                                                .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                                        })
+
+                                        // adding remote machine's location into map
+                                        addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
+                                    })
+
+                                }).catch(e => {
+                                    // doing nothing as of now
+                                })
+
+                            })
+                    console.log('Successful look up'.green)
+
+                }).catch(_ => {
+                    screen.destroy()
+                    console.log('[!]URL lookup failed'.red)
+                    process.exit(1)
+                })
+
+            })
+        })
+    .command('la <asn> <db> <asndb>', 'Geo locate IPv4 addresses owned by Autonomous System',
+        {
+            asn: { describe: 'autonomous system number to be looked up', type: 'int' },
+            db: { describe: 'path to ip2location-db5.bin', type: 'string' },
+            asndb: { describe: 'path to ip2location-ipv4-asn.db', type: 'string' }
         }, argv => {
             checkDB5Existance(argv.db)
 
