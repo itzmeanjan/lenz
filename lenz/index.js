@@ -15,8 +15,7 @@ const { getTCPAndUDPPeers } = require('./socket')
 const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
 const { getHTML, extractCSSResources, extractScriptResources, extractImageResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
-const { geoIPFromASN } = require('./asn')
-const { isMainThread, Worker, parentPort } = require('worker_threads')
+const { Worker } = require('worker_threads')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -466,8 +465,6 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             checkDB5Existance(argv.db)
             checkDB5Existance(argv.asndb)
 
-            init(argv.db)
-
             const screen = blessed.screen()
             const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
             const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
@@ -500,52 +497,30 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             // flash every .5 seconds
             setInterval(enableFlashEffect, 500, map, screen)
 
-            if (isMainThread) {
-                const worker = new Worker(__filename)
+            const worker = new Worker('./worker.js', { db: argv.db, asndb: argv.asndb, asn: argv.asn })
+            worker.on('message', m => {
+                markers.push({ ...m, color: 'red', char: 'X' })
 
-                worker.on('message', m => {
-                    markers.push({ ...m, color: 'red', char: 'X' })
+                table.setData({
+                    headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                    data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                })
 
-                    table.setData({
-                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
-                    })
-
-                    addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
-                })
-                worker.on('error', e => {
-                    if (e) {
-                        screen.destroy()
-                        console.log(`${e}`.red)
-                        process.exit(1)
-                    }
-                })
-                worker.on('exit', c => {
-                    if (c != 0) {
-                        screen.destroy()
-                        console.log('[!]Abnormal death of data provider'.red)
-                        process.exit(1)
-                    }
-                })
-            } else {
-                getMyIP().then(ip => {
-                    let resp = lookup(ip)
-                    if (validateLookup(resp)) {
-                        parentPort.postMessage(resp)
-                    }
-
-                    const listener = geoIPFromASN(argv.asndb, argv.asn, lookup)
-                    listener.on('ip', v => {
-                        parentPort.postMessage(v)
-                    })
-                    listener.once('asn', v => {
-                        // just doing nothing as of now
-                        //console.log('Successful look up'.green)
-                    })
-                    listener.on('error', e => {
-                        throw new Error(e)
-                    })
-                })
-            }
+                addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
+            })
+            worker.on('error', e => {
+                if (e) {
+                    screen.destroy()
+                    console.log(`${e}`.red)
+                    process.exit(1)
+                }
+            })
+            worker.on('exit', c => {
+                if (c != 0) {
+                    screen.destroy()
+                    console.log('[!]Abnormal death of data provider'.red)
+                    process.exit(1)
+                }
+            })
         })
     .demandCommand().help().wrap(72).argv
