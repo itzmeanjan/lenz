@@ -38,6 +38,9 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 - Can find all active TCP/UDP socket connections & marks their respective peers in console map 🤩
 - Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map 🤓
 - Given any random URL, parses HTML & extracts out all static content i.e. {`*.js`, `*.css`, `image/*`} delivery domains & geo locate them 😎
+- Given Autonomous System Number ( `ASN` ), geo locates all IPv4 addresses owned by this Autonomous System ( `AS` ) 😉🦾
+
+> Caution: This operation is very computationally intensive, for large Autonomous Systems
 
 In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map
 
