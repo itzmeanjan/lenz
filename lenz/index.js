@@ -515,6 +515,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 })
                 listener.once('asn', v => {
                     // just doing nothing as of now
+                    console.log('Successful look up'.green)
                 })
                 listener.on('error', e => {
                     screen.destroy()
