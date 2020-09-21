@@ -502,11 +502,14 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
                 }
 
-                // middleware to be invoked
-                //fn(map, table, screen)
                 const listener = geoIPFromASN(argv.asndb, argv.asn, lookup)
                 listener.on('ip', v => {
                     markers.push({ ...v, color: 'magenta', char: 'o' })
+
+                    table.setData({
+                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                    })
 
                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                 })
