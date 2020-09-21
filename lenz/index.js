@@ -16,6 +16,7 @@ const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
 const { getHTML, extractCSSResources, extractScriptResources, extractImageResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
 const { geoIPFromASN } = require('./asn')
+const { isMainThread, Worker, parentPort } = require('worker_threads')
 
 // validating user given torrent magnet link
 const checkMagnetLinkValidation = _magnet => {
@@ -485,6 +486,22 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 , columnWidth: [36, 10, 10, 40, 30]
             })
             table.focus()
+
+            if (isMainThread) {
+                const worker = new Worker(__filename)
+
+                worker.on('message', m => { })
+                worker.on('error', e => { })
+                worker.on('exit', c => {
+                    if (c != 0) {
+                        screen.destroy()
+                        console.log('[!]Data provider died'.red)
+                        process.exit(0)
+                    }
+                })
+            } else {
+
+            }
 
             getMyIP().then(ip => {
                 let resp = lookup(ip)
