@@ -497,7 +497,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             // flash every .5 seconds
             setInterval(enableFlashEffect, 500, map, screen)
 
-            const worker = new Worker('./worker.js', { db: argv.db, asndb: argv.asndb, asn: argv.asn })
+            const worker = new Worker('./worker.js', { workerData: { db: argv.db, asndb: argv.asndb, asn: argv.asn } })
             worker.on('message', m => {
                 markers.push({ ...m, color: 'red', char: 'X' })
 

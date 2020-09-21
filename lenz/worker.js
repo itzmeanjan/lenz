@@ -10,11 +10,11 @@ init(workerData.db)
 getMyIP().then(v => {
     let resp = lookup(v)
     if (validateLookup(resp)) {
-        parentPort.postMessage(resp)
+        parentPort.postMessage({ ...resp, self: true })
     }
 
     const listener = geoIPFromASN(workerData.asndb, workerData.asn, lookup)
-    listener.on('ip', v => { parentPort.postMessage(v) })
+    listener.on('ip', v => { parentPort.postMessage({ ...v, self: false }) })
     listener.once('asn', v => { parentPort.close() })
     listener.on('error', e => { throw new Error(e) })
 
