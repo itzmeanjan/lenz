@@ -500,7 +500,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             const worker = new Worker('./worker.js', { workerData: { db: argv.db, asndb: argv.asndb, asn: argv.asn } })
             worker.on('message', m => {
                 if (m.self) {
-                    markers.push({ ...m, color: 'red', char: 'X' })
+                    markers.push({ ...m, color: 'red', char: 'x' })
                 } else {
                     markers.push({ ...m, color: 'magenta', char: 'o' })
                 }
@@ -511,7 +511,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 })
 
                 if (m.self) {
-                    addMarkerAndRender(m.lon, m.lat, 'red', 'X', map, screen)
+                    addMarkerAndRender(m.lon, m.lat, 'red', 'x', map, screen)
                 } else {
                     addMarkerAndRender(m.lon, m.lat, 'magenta', 'o', map, screen)
                 }
@@ -529,7 +529,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     console.log('[!]Abnormal death of data provider'.red)
                     process.exit(1)
                 } else {
-                    console.log('Successful look up')
+                    console.log('Successful look up'.green)
                 }
             })
         })
