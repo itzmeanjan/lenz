@@ -221,6 +221,26 @@ Options:
 Not enough non-option arguments: got 0, need at least 2
 ```
 
+### Geo Locate IPv4 addresses owned by some Autonomous System ( la )
+
+Given Autonomous System Number [ `ASN` ] of a certain organization, finds all IPv4 address ranges controlled by `ASN`, and geo locate them using IP2Location DB5 database, which are to be shown on console map.
+
+```bash
+5p1d3r:lenz anjan$ lenz la
+lenz la <asn> <db> <asndb>
+
+Geo locate IPv4 addresses owned by Autonomous System
+
+Options:
+  --version  Show version number                               [boolean]
+  --help     Show help                                         [boolean]
+  --asn      autonomous system number to be looked up
+  --db       path to ip2location-db5.bin                        [string]
+  --asndb    path to ip2location-ipv4-asn.db                    [string]
+
+Not enough non-option arguments: got 0, need at least 3
+```
+
 ## contribution
 
 If you're interested in adding more features to this CLI tool, please raise a PR.
