@@ -525,9 +525,9 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 }
             })
             worker.on('exit', c => {
-                if (c != 0) {
+                if (c !== 0) {
                     screen.destroy()
-                    console.log('[!]Abnormal death of data provider'.red)
+                    console.log(`Something went wrong`.red)
                     process.exit(1)
                 } else {
                     console.log('Successful look up'.green)

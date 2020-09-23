@@ -32,6 +32,6 @@ getMyIP().then(v => {
     // when all lookup is done, message channel is closed
     listener.once('asn', v => { parentPort.close() })
     // throws error on occurance of some issue in main worker, which is notified to main listener on main thread
-    listener.on('error', e => { throw new Error(e) })
+    listener.on('error', e => { process.exit(1) })
 
-}).catch(e => { throw new Error(e) })
+}).catch(e => { process.exit(1) })
