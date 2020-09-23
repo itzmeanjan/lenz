@@ -476,7 +476,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 , selectedFg: 'green'
                 , selectedBg: 'black'
                 , interactive: true
-                , label: 'Connected Peer(s)'
+                , label: 'IPv4 Addresses'
                 , width: '100%'
                 , height: '95%'
                 , border: { type: "line", fg: "cyan" }
