@@ -29,9 +29,9 @@ const checkMagnetLinkValidation = _magnet => {
     return parsed.infoHash
 }
 
-// checking existance of local ip2location db5 file
+// checking existance of local ip2location db file {*.bin, *.csv}
 // if not present, exit process with return code 1
-const checkDB5Existance = db => {
+const checkDBExistance = db => {
     if (!existsSync(db)) {
         console.log('[!]Can\'t find IP2Location Database'.red)
         process.exit(1)
@@ -242,7 +242,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
         db: { describe: 'path to ip2location-db5.bin', type: 'string' },
         dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
     }, argv => {
-        checkDB5Existance(argv.db)
+        checkDBExistance(argv.db)
         const infoHash = checkMagnetLinkValidation(argv.magnet)
 
         // initialized ip2location db5 database
@@ -285,7 +285,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
-            checkDB5Existance(argv.db)
+            checkDBExistance(argv.db)
             checkDomainNameValidation(argv.domain)
 
             init(argv.db)
@@ -320,7 +320,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
-            checkDB5Existance(argv.db)
+            checkDBExistance(argv.db)
             checkIPAddressValidation(argv.ip)
 
             init(argv.db)
@@ -347,7 +347,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
-            checkDB5Existance(argv.db)
+            checkDBExistance(argv.db)
             // this command is only supported in macos & gnu/linux
             checkForSupportedPlatform()
 
@@ -414,7 +414,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
-            checkDB5Existance(argv.db)
+            checkDBExistance(argv.db)
 
             init(argv.db)
             render((map, table, screen) => {
@@ -463,8 +463,8 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             asndb: { describe: 'path to ip2location-ipv4-asn.db', type: 'string' }
         }, argv => {
-            checkDB5Existance(argv.db)
-            checkDB5Existance(argv.asndb)
+            checkDBExistance(argv.db)
+            checkDBExistance(argv.asndb)
 
             const screen = blessed.screen()
             const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
