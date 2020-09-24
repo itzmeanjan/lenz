@@ -14,6 +14,7 @@ Console based MAP 🗺, with lots of features packed in 👇
 - [How do I install it ?](#installation)
 - [How do I use it ?](#usage)
 - [Can I add one new feature ?](#contribution)
+- [Any attribution ?](#attribution)
 
 ## Motivation
 
@@ -255,7 +256,7 @@ Options:
 Not enough non-option arguments: got 0, need at least 3
 ```
 
-## contribution
+## Contribution
 
 If you're interested in adding more features to this CLI tool, please raise a PR.
 
