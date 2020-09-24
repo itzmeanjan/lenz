@@ -4,7 +4,7 @@ Console based MAP 🗺 , with lots of features 😉
 
 > More can be found [here](https://github.com/itzmeanjan/lenz#motivation)
 
-## features
+## Features
 
 - Given (sub-)domain name, it can look up all associated server IPv4/6 addresses, showing them in console map
 - Given IPv4/6 address, can lookup it's location & show it in console map
@@ -19,7 +19,7 @@ _In all these cases, generates a tabular report of all connected peers _( includ
 
 > Now also dumps peers along with location info into JSON file, for all supported commands
 
-## prerequisite
+## Prerequisite
 
 We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude) for using this tool.
 
@@ -27,7 +27,7 @@ Consider using IPv6 Binary version, cause that will also support IPv4 lookup. Th
 
 And you need to have NodeJS( >10.X ).
 
-## installation
+## Installation
 
 Download & install from NPM.
 
@@ -35,7 +35,7 @@ Download & install from NPM.
 npm i -g lenz
 ```
 
-## develop
+## Develop
 
 You can clone this repo in your machine & try to do installation another way.
 
@@ -53,7 +53,7 @@ npm i -g .
 
 Now you can use `lenz` from any where in your directory tree.
 
-## usage
+## Usage
 
 Invoke `lenz` from CLI, supply proper params for each of supported commands.
 
@@ -77,7 +77,7 @@ Not enough non-option arguments: got 0, need at least 1P
 
 Please check here for more [info](https://github.com/itzmeanjan/lenz#usage)
 
-## contribution
+## Contribution
 
 If you're interested in adding more features to this CLI tool, please raise a PR.
 
