@@ -457,15 +457,17 @@ const argv = require('yargs').scriptName('lenz'.magenta)
 
             })
         })
-    .command('la <asn> <db> <asndb>', 'Geo locate IPv4 addresses owned by Autonomous System',
+    .command('la <asn> <db> <asndb> [dump]', 'Geo locate IPv4 addresses owned by Autonomous System',
         {
             asn: { describe: 'autonomous system number to be looked up', type: 'int' },
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
-            asndb: { describe: 'path to ip2location-ipv4-asn.db', type: 'string' }
+            asndb: { describe: 'path to ip2location-ipv4-asn.db', type: 'string' },
+            dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
             checkDBExistance(argv.db)
             checkDBExistance(argv.asndb)
-
+            
+            init(argv.db)
             render((map, table, screen) => {
 
                 const worker = new Worker(join(__dirname, 'worker.js'), { workerData: { db: argv.db, asndb: argv.asndb, asn: argv.asn } })
