@@ -15,7 +15,7 @@ Console based MAP 🗺, with lots of features packed in 👇
 - [How do I use it ?](#usage)
 - [Can I add one new feature ?](#contribution)
 
-## motivation
+## Motivation
 
 I was looking for one fully console based geo location data visualiser, with below functionalities 
 
@@ -31,7 +31,7 @@ But couldn't find one, may be I required to try harder. So I decided to write on
 
 I interested in extending its functionalites in coming days, if you find I'm missing certain use case, feel free to let me know/ just raise a PR.
 
-## features
+## Features
 
 - Given (sub-)domain name, it can look up all associated server IPv4/6 addresses, showing them in console map 🥴
 - Given IPv4/6 address, can lookup it's location & show it in console map 🥳
@@ -44,7 +44,7 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 
 In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map
 
-## prerequisite
+## Prerequisite
 
 We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude) for using this tool.
 
@@ -57,9 +57,9 @@ We'll also need [IP2Location™ LITE IP-ASN Database](https://lite.ip2location.c
 
 And we need to have NodeJS( >10.X ).
 
-## installation
+## Installation
 
-### using NPM
+### Using NPM
 
 This [software](https://www.npmjs.com/package/lenz) is distributed using NPM.
 
@@ -67,7 +67,7 @@ This [software](https://www.npmjs.com/package/lenz) is distributed using NPM.
 npm i -g lenz
 ```
 
-### using GITHUB
+### Using GITHUB
 
 You can clone this repo in your machine and run below commands to use this CLI tool.
 
@@ -87,7 +87,7 @@ npm i -g .
 
 Now you can use `lenz` from any where in your directory tree.
 
-## usage
+## Usage
 
 Invoke `lenz` from CLI, supplying proper params for each of supported commands.
 
@@ -115,7 +115,7 @@ Not enough non-option arguments: got 0, need at least 1
 
 > Please use tool's help option for getting more info related to supported commands.
 
-### show peers by magnet link ( lm )
+### Show peers by magnet link ( lm )
 
 Get a magnet link & supply it while invoking `lenz`
 
@@ -136,7 +136,7 @@ Options:
 Not enough non-option arguments: got 0, need at least 2
 ```
 
-### look up by domain name ( ld )
+### Look up by domain name ( ld )
 
 Domain name to be resolved to IPv _{4,6}_ addresses & shown on console map.
 
@@ -157,7 +157,7 @@ Options:
 Not enough non-option arguments: got 0, need at least 2
 ```
 
-### look up by ip address ( lp )
+### Look up by ip address ( lp )
 
 Looks up IPv _{4,6}_  address location & shows on console map.
 
@@ -178,7 +178,7 @@ Options:
 Not enough non-option arguments: got 0, need at least 2
 ```
 
-### find all active TCP/UDP sockets ( ls )
+### Find all active TCP/UDP sockets ( ls )
 
 Finds out all active TCP/UDP socket connections & their peers, which are then shown on console map
 
