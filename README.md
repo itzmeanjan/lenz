@@ -258,3 +258,9 @@ Not enough non-option arguments: got 0, need at least 3
 ## contribution
 
 If you're interested in adding more features to this CLI tool, please raise a PR.
+
+## Attribution
+
+This non-profit open sourced software uses [IP2Location LITE Database](https://lite.ip2location.com).
+
+Thanks to IP2Location :wink:
