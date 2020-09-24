@@ -466,72 +466,45 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             checkDBExistance(argv.db)
             checkDBExistance(argv.asndb)
 
-            const screen = blessed.screen()
-            const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
-            const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
-            const table = grid.set(10, 0, 2, 1, contrib.table, {
-                keys: true
-                , vi: true
-                , fg: 'white'
-                , selectedFg: 'green'
-                , selectedBg: 'black'
-                , interactive: true
-                , label: 'IPv4 Addresses'
-                , width: '100%'
-                , height: '95%'
-                , border: { type: "line", fg: "cyan" }
-                , columnSpacing: 10
-                , columnWidth: [36, 10, 10, 40, 30]
-            })
-            table.focus()
+            render((map, table, screen) => {
 
-            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
-            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
-                screen.destroy()
-                console.log('\n')
-                console.table(markers, ['ip', 'lon', 'lat', 'region', 'country'])
-                console.log('\n')
-                process.exit(0)
-            })
-            // first screen render
-            screen.render()
-            // flash every .5 seconds
-            setInterval(enableFlashEffect, 500, map, screen)
+                const worker = new Worker(join(__dirname, 'worker.js'), { workerData: { db: argv.db, asndb: argv.asndb, asn: argv.asn } })
+                worker.on('message', m => {
+                    if (m.self) {
+                        markers.push({ ...m, color: 'red', char: 'x' })
+                    } else {
+                        markers.push({ ...m, color: 'magenta', char: 'o' })
+                    }
 
-            const worker = new Worker(join(__dirname, 'worker.js'), { workerData: { db: argv.db, asndb: argv.asndb, asn: argv.asn } })
-            worker.on('message', m => {
-                if (m.self) {
-                    markers.push({ ...m, color: 'red', char: 'x' })
-                } else {
-                    markers.push({ ...m, color: 'magenta', char: 'o' })
-                }
+                    table.setData({
+                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                    })
 
-                table.setData({
-                    headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                    data: markers.map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                    if (m.self) {
+                        addMarkerAndRender(m.lon, m.lat, 'red', 'x', map, screen)
+                    } else {
+                        addMarkerAndRender(m.lon, m.lat, 'magenta', 'o', map, screen)
+                    }
+                })
+                worker.on('error', e => {
+                    if (e) {
+                        screen.destroy()
+                        console.log(`${e}`.red)
+                        process.exit(1)
+                    }
+                })
+                worker.on('exit', c => {
+                    if (c !== 0) {
+                        screen.destroy()
+                        console.log(`Something went wrong`.red)
+                        process.exit(1)
+                    } else {
+                        console.log('Successful look up'.green)
+                    }
                 })
 
-                if (m.self) {
-                    addMarkerAndRender(m.lon, m.lat, 'red', 'x', map, screen)
-                } else {
-                    addMarkerAndRender(m.lon, m.lat, 'magenta', 'o', map, screen)
-                }
             })
-            worker.on('error', e => {
-                if (e) {
-                    screen.destroy()
-                    console.log(`${e}`.red)
-                    process.exit(1)
-                }
-            })
-            worker.on('exit', c => {
-                if (c !== 0) {
-                    screen.destroy()
-                    console.log(`Something went wrong`.red)
-                    process.exit(1)
-                } else {
-                    console.log('Successful look up'.green)
-                }
-            })
+
         })
     .demandCommand().help().wrap(72).argv
