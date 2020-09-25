@@ -103,7 +103,13 @@ const getTCPAndUDPPeers = _ => {
     })
 
     const stream = new EventEmitter()
-    watcher().then(v => stream.emit('peers', v)).catch(e => stream.emit('error', e))
+    const worker = (stream) => {
+        watcher().then(v => {
+            stream.emit('peers', v)
+
+            setTimeout(worker, 2000, [stream])
+        }).catch(e => stream.emit('error', e))
+    }
     return stream
 }
 
