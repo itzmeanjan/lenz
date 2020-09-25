@@ -1,6 +1,6 @@
 {
   "name": "lenz",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Console based MAP 🗺, with lots of features packed in 😎",
   "main": "index.js",
   "bin": {
@@ -29,7 +29,10 @@
     "dataviz",
     "domains",
     "peer",
-    "iplocation"
+    "iplocation",
+    "linux",
+    "lsof",
+    "tcp/udp"
   ],
   "author": "Anjan Roy <anjanroy@yandex.com>",
   "license": "CC0-1.0",

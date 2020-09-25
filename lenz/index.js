@@ -354,8 +354,20 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             init(argv.db)
 
             render((map, table, screen) => {
-                // middleware to be invoked
-                getTCPAndUDPPeers().then(v => {
+                // using this we can start listening to {peers, error} events
+                const listener = getTCPAndUDPPeers()
+
+                listener.on('peers', v => {
+                    // as this listener will keep receiving data here after each successful system query
+                    // we can't keep pushing new peer addresses in existing collection
+                    //
+                    // rather we're going to empty current cache & make it ready for next one
+                    // except very first element, because we're interested in keeping this
+                    // machine location info cached
+                    if (markers.length !== 0) {
+                        markers = markers.slice(0, 1)
+                    }
+
                     v.forEach(v => {
                         if (isIP(v)) {
                             let resp = lookup(v)
@@ -393,16 +405,17 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                                 })
 
-                            }).catch(_ => {
-                                // doing nothing as of now
-                            })
+                            }).catch(_ => { })
                         }
                     })
+                })
+                listener.on('error', e => {
+                    // stopping listening to event stream first
+                    listener.off('peers')
+                    listener.off('error')
 
-                    console.log('Successful look up'.green)
-                }).catch(_ => {
                     screen.destroy()
-                    console.log('[!]Failed to find open socket(s)'.red)
+                    console.log('[!]System scan failed'.red)
                     process.exit(1)
                 })
             })
@@ -466,7 +479,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
         }, argv => {
             checkDBExistance(argv.db)
             checkDBExistance(argv.asndb)
-            
+
             init(argv.db)
             render((map, table, screen) => {
 

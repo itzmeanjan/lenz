@@ -1,4 +1,5 @@
 const { spawn } = require('child_process')
+const { EventEmitter } = require('events')
 
 // runs lsof command for finding all active socket connections
 // both tcp & udp connections are listed
@@ -91,14 +92,37 @@ const awk_2 = data => new Promise((resolve, reject) => {
 // and returns an array of them, which can be used for looking up
 // their respective location & then to be drawn on 
 // map [ which is our final objective i.e. visualization of connected socket peers on console map : lenz ]
-const getTCPAndUDPPeers = _ => new Promise((resolve, reject) => {
-    lsof().then(v => awk_0(v)
-        .then(v => awk_1(v)
-            .then(v => awk_2(v).then(v => resolve(v.split('\n').filter(v => v.length !== 0)
-                .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, ''))))
-                .catch(reject)).catch(reject))
-        .catch(reject)).catch(reject)
-})
+const getTCPAndUDPPeers = _ => {
+    const watcher = _ => new Promise((resolve, reject) => {
+        lsof().then(v => awk_0(v)
+            .then(v => awk_1(v)
+                .then(v => awk_2(v).then(v => resolve(
+                    v.split('\n').filter(v => v.length !== 0)
+                        .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, ''))
+                        .filter((v, i, a) => i === a.findIndex(t => t === v))
+                ))
+                    .catch(reject)).catch(reject))
+            .catch(reject)).catch(reject)
+    })
+
+    const stream = new EventEmitter()
+    // this async block keeps running watcher, which will
+    // keep querying system about what are tcp/ udp peers are connected to machine, currently
+    const worker = async (stream) => {
+        while (true) {
+            try {
+                const peers = await watcher()
+                stream.emit('peers', peers)
+            } catch (e) {
+                stream.emit('error', e)
+            }
+        }
+    }
+
+    // and here we invoke worker, which is going for one infinite iteration
+    worker(stream)
+    return stream
+}
 
 module.exports = {
     getTCPAndUDPPeers
