@@ -354,8 +354,10 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             init(argv.db)
 
             render((map, table, screen) => {
-                // middleware to be invoked
-                getTCPAndUDPPeers().then(v => {
+                // using this we can start listening to {peers, error} events
+                const listener = getTCPAndUDPPeers()
+
+                listener.on('peers', v => {
                     v.forEach(v => {
                         if (isIP(v)) {
                             let resp = lookup(v)
@@ -399,10 +401,15 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                         }
                     })
 
-                    console.log('Successful look up'.green)
-                }).catch(_ => {
+                    console.log('Scanning again ...'.green)
+                })
+                listener.on('error', e => {
+                    // stopping listening to event stream first
+                    listener.off('peers')
+                    listener.off('error')
+
                     screen.destroy()
-                    console.log('[!]Failed to find open socket(s)'.red)
+                    console.log('[!]System scan failed'.red)
                     process.exit(1)
                 })
             })
@@ -466,7 +473,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
         }, argv => {
             checkDBExistance(argv.db)
             checkDBExistance(argv.asndb)
-            
+
             init(argv.db)
             render((map, table, screen) => {
 
