@@ -93,4 +93,4 @@ If you're interested in adding more features to this CLI tool, please raise a PR
 
 This non-profit open sourced software uses [IP2Location LITE Database](https://lite.ip2location.com).
 
-Thanks to IP2Location :wink:
+Thanks to [@IP2Location](https://github.com/ip2location)
