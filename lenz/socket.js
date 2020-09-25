@@ -1,4 +1,5 @@
 const { spawn } = require('child_process')
+const { EventEmitter } = require('events')
 
 // runs lsof command for finding all active socket connections
 // both tcp & udp connections are listed
@@ -91,14 +92,20 @@ const awk_2 = data => new Promise((resolve, reject) => {
 // and returns an array of them, which can be used for looking up
 // their respective location & then to be drawn on 
 // map [ which is our final objective i.e. visualization of connected socket peers on console map : lenz ]
-const getTCPAndUDPPeers = _ => new Promise((resolve, reject) => {
-    lsof().then(v => awk_0(v)
-        .then(v => awk_1(v)
-            .then(v => awk_2(v).then(v => resolve(v.split('\n').filter(v => v.length !== 0)
-                .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, ''))))
-                .catch(reject)).catch(reject))
-        .catch(reject)).catch(reject)
-})
+const getTCPAndUDPPeers = _ => {
+    const watcher = _ => new Promise((resolve, reject) => {
+        lsof().then(v => awk_0(v)
+            .then(v => awk_1(v)
+                .then(v => awk_2(v).then(v => resolve(v.split('\n').filter(v => v.length !== 0)
+                    .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, ''))))
+                    .catch(reject)).catch(reject))
+            .catch(reject)).catch(reject)
+    })
+
+    const stream = new EventEmitter()
+    watcher().then(v => stream.emit('peers', v)).catch(e => stream.emit('error', e))
+    return stream
+}
 
 module.exports = {
     getTCPAndUDPPeers
