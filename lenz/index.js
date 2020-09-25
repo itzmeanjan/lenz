@@ -358,6 +358,14 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 const listener = getTCPAndUDPPeers()
 
                 listener.on('peers', v => {
+                    // as this listener will keep receiving data here after each successful system query
+                    // we can't keep pushing new peer addresses in existing collection
+                    //
+                    // rather we're going to empty current cache & make it ready for next one
+                    if (markers.length !== 0) {
+                        markers = []
+                    }
+
                     v.forEach(v => {
                         if (isIP(v)) {
                             let resp = lookup(v)
@@ -395,9 +403,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                     addMarkerAndRender(v.lon, v.lat, 'magenta', 'o', map, screen)
                                 })
 
-                            }).catch(_ => {
-                                // doing nothing as of now
-                            })
+                            }).catch(_ => { })
                         }
                     })
 
