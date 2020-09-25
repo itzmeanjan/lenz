@@ -20,7 +20,7 @@ Console based MAP 🗺, with lots of features packed in 👇
 
 I was looking for one fully console based geo location data visualiser, with below functionalities 
 
-- can geo locate machine's connected TCP/ UDP peers 👩‍💻
+- can keep geo locate machine's connected TCP/ UDP peers 👩‍💻
 - can geo locate any IP Address
 - can geo locate all IPv{4,6} addresses, resolvable from (sub-)domain name
 - can geo locate peers, given torrent 🧲 link
@@ -37,11 +37,14 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 - Given (sub-)domain name, it can look up all associated server IPv4/6 addresses, showing them in console map 🥴
 - Given IPv4/6 address, can lookup it's location & show it in console map 🥳
 - Can find all active TCP/UDP socket connections & marks their respective peers in console map 🤩
+
+> Note: For 👆 operation, auto refresh has been enabled
+
 - Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map 🤓
 - Given any random URL, parses HTML & extracts out all static content i.e. {`*.js`, `*.css`, `image/*`} delivery domains & geo locate them 😎
 - Given Autonomous System Number ( `ASN` ), geo locates all IPv4 addresses owned by this Autonomous System ( `AS` ) 😉🦾
 
-> Caution: This operation is very computationally intensive, for large Autonomous Systems
+> Caution: 👆 operation is very computationally intensive, for large Autonomous Systems, might take some time to complete, though it keeps streaming, as soon as it finds something useful
 
 In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map
 
@@ -51,7 +54,7 @@ We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITU
 
 Consider using IPv6 Binary version, cause that will also support IPv4 lookup. This specific database I've planned to use is codenamed **db5**.
 
-Please try to stick with that, otherwise there might be some unexpected behaviours.
+Please try to stick with that to avoid unexpected behaviours.
 
 We'll also need [IP2Location™ LITE IP-ASN Database](https://lite.ip2location.com/database/ip-asn) for using `la` command. See [below](#geo-locate-ipv4-addresses-owned-by-some-autonomous-system--la-).
   - Please use IPv4 version of ASN Database

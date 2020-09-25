@@ -362,6 +362,8 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     // we can't keep pushing new peer addresses in existing collection
                     //
                     // rather we're going to empty current cache & make it ready for next one
+                    // except very first element, because we're interested in keeping this
+                    // machine location info cached
                     if (markers.length !== 0) {
                         markers = markers.slice(0, 1)
                     }

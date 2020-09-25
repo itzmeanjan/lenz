@@ -6,16 +6,19 @@ Console based MAP 🗺 , with lots of features 😉
 
 ## Features
 
-- Given (sub-)domain name, it can look up all associated server IPv4/6 addresses, showing them in console map
-- Given IPv4/6 address, can lookup it's location & show it in console map
-- Can find all active TCP/UDP socket connections & marks their respective peers in console map
-- Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map
-- Given one URL, parses HTML & extracts out all static content i.e. {`js`, `css`} delivery domains & geo locate them
-- Given Autonomous System Number ( `ASN` ), geo locates all IPv4 addresses owned by this Autonomous System ( `AS` )
+- Given (sub-)domain name, it can look up all associated server IPv4/6 addresses, showing them in console map 🥴
+- Given IPv4/6 address, can lookup it's location & show it in console map 🥳
+- Can find all active TCP/UDP socket connections & marks their respective peers in console map 🤩
 
-> Caution: This operation is very computationally intensive, for large Autonomous Systems
+> Note: For 👆 operation, auto refresh has been enabled
 
-_In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map_
+- Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map 🤓
+- Given any random URL, parses HTML & extracts out all static content i.e. {`*.js`, `*.css`, `image/*`} delivery domains & geo locate them 😎
+- Given Autonomous System Number ( `ASN` ), geo locates all IPv4 addresses owned by this Autonomous System ( `AS` ) 😉🦾
+
+> Caution: 👆 operation is very computationally intensive, for large Autonomous Systems, might take some time to complete, though it keeps streaming, as soon as it finds something useful
+
+In all these cases, generates a tabular report of all connected peers _( including self )_, who were shown on console map
 
 > Now also dumps peers along with location info into JSON file, for all supported commands
 
@@ -24,6 +27,11 @@ _In all these cases, generates a tabular report of all connected peers _( includ
 We need to download [IP2Location™ LITE IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE Database](https://lite.ip2location.com/database/ip-country-region-city-latitude-longitude) for using this tool.
 
 Consider using IPv6 Binary version, cause that will also support IPv4 lookup. This specific database, I've planned to use, is codenamed **db5**.
+
+Please try to stick with that to avoid unexpected behaviours.
+
+We'll also need [IP2Location™ LITE IP-ASN Database](https://lite.ip2location.com/database/ip-asn) for using `la` command. See [below](#geo-locate-ipv4-addresses-owned-by-some-autonomous-system--la-).
+  - Please use IPv4 version of ASN Database
 
 And you need to have NodeJS( >10.X ).
 
