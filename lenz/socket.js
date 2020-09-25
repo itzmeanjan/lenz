@@ -103,13 +103,20 @@ const getTCPAndUDPPeers = _ => {
     })
 
     const stream = new EventEmitter()
-    const worker = (stream) => {
-        watcher().then(v => {
-            stream.emit('peers', v)
-
-            setTimeout(worker, 2000, [stream])
-        }).catch(e => stream.emit('error', e))
+    // this async block keeps running watcher, which will
+    // keep querying what are tcp/ udp peers are connected to machine
+    const worker = async (stream) => {
+        while (true) {
+            try {
+                const peers = await watcher()
+                stream.emit('peers', peers)
+            } catch (e) {
+                stream.emit('error', e)
+            }
+        }
     }
+
+    worker(stream)
     return stream
 }
 
