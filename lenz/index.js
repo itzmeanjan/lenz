@@ -363,7 +363,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     //
                     // rather we're going to empty current cache & make it ready for next one
                     if (markers.length !== 0) {
-                        markers = []
+                        markers = markers.slice(0, 1)
                     }
 
                     v.forEach(v => {
@@ -406,8 +406,6 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                             }).catch(_ => { })
                         }
                     })
-
-                    console.log('Scanning again ...'.green)
                 })
                 listener.on('error', e => {
                     // stopping listening to event stream first
