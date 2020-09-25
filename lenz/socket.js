@@ -96,8 +96,11 @@ const getTCPAndUDPPeers = _ => {
     const watcher = _ => new Promise((resolve, reject) => {
         lsof().then(v => awk_0(v)
             .then(v => awk_1(v)
-                .then(v => awk_2(v).then(v => resolve(v.split('\n').filter(v => v.length !== 0)
-                    .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, ''))))
+                .then(v => awk_2(v).then(v => resolve(
+                    v.split('\n').filter(v => v.length !== 0)
+                        .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, ''))
+                        .filter((v, i, a) => i === a.findIndex(t => t === v))
+                ))
                     .catch(reject)).catch(reject))
             .catch(reject)).catch(reject)
     })
