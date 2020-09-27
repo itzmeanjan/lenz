@@ -88,9 +88,15 @@ const awk_2 = data => new Promise((resolve, reject) => {
 })
 
 const getTCPAndUDPPeersX = _ => new Promise((resolve, reject) => {
-    lsof().then(awk_0).then(awk_1).then(v => {
-        console.log(v.split('\n').filter(v => v.length !== 0))
-    }).catch(reject).catch(reject).catch(reject)
+    lsof().then(awk_0).then(awk_1).then(v =>
+        resolve(v.split('\n')
+            .filter(v => v.length !== 0)
+            .map(v => v.split(' '))
+            .map(v => [
+                v[0],
+                v[1].replace(/.*->/, '').split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')
+            ])))
+        .catch(reject).catch(reject).catch(reject)
 })
 
 // extracts all tcp/ udp peer addresses ( ip address/ domain name/ sub-domain name )
