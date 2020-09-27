@@ -87,17 +87,43 @@ const awk_2 = data => new Promise((resolve, reject) => {
     })
 })
 
-const getTCPAndUDPPeersX = _ => new Promise((resolve, reject) => {
-    lsof().then(awk_0).then(awk_1).then(v =>
-        resolve(v.split('\n')
-            .filter(v => v.length !== 0)
-            .map(v => v.split(' '))
-            .map(v => [
-                v[0],
-                v[1].replace(/.*->/, '').split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')
-            ])))
-        .catch(reject).catch(reject).catch(reject)
-})
+// this function is capable of extracting out currently connected all TCP/ UDP
+// connection peer address/ domain names, along with respective application
+// which is using this connection for passing in/ out data
+//
+// this output to be used in console map, to provide a better live visualization
+// capability
+const getTCPAndUDPPeersX = _ => {
+    const watcher = new Promise((resolve, reject) => {
+        lsof().then(awk_0).then(awk_1).then(v =>
+            resolve(v.split('\n')
+                .filter(v => v.length !== 0)
+                .map(v => v.split(' '))
+                .map(v => [
+                    v[0],
+                    v[1].replace(/.*->/, '').split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')
+                ])))
+            .catch(reject).catch(reject).catch(reject)
+    })
+
+    const stream = new EventEmitter()
+    // this async block keeps running watcher, which will
+    // keep querying system about what are tcp/ udp peers are connected to machine, currently
+    const worker = async (stream) => {
+        while (true) {
+            try {
+                const peers = await watcher()
+                stream.emit('peers', peers)
+            } catch (e) {
+                stream.emit('error', e)
+            }
+        }
+    }
+
+    // and here we invoke worker, which is going for one infinite iteration
+    worker(stream)
+    return stream
+}
 
 // extracts all tcp/ udp peer addresses ( ip address/ domain name/ sub-domain name )
 // to which this machine is currently talking to
