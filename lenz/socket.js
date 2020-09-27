@@ -94,7 +94,7 @@ const awk_2 = data => new Promise((resolve, reject) => {
 // this output to be used in console map, to provide a better live visualization
 // capability
 const getTCPAndUDPPeersX = _ => {
-    const watcher = new Promise((resolve, reject) => {
+    const watcher = _ => new Promise((resolve, reject) => {
         lsof().then(awk_0).then(awk_1).then(v =>
             resolve(v.split('\n')
                 .filter(v => v.length !== 0)
@@ -102,7 +102,8 @@ const getTCPAndUDPPeersX = _ => {
                 .map(v => [
                     v[0],
                     v[1].replace(/.*->/, '').split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')
-                ])))
+                ])
+                .filter((v, i, a) => i === a.findIndex(t => t[0] === v[0] && t[1] === v[1]))))
             .catch(reject).catch(reject).catch(reject)
     })
 
