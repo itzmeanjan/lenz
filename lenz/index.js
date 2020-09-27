@@ -342,13 +342,14 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 console.log('Successful look up'.green)
             })
         })
+    // this command is only supported in darwin & gnu/linux
+    // due to the fact, it uses lsof & awk, these two unix utilities
     .command('ls <db> [dump]', 'Find location of connected TCP/UDP socket peer(s)',
         {
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
             checkDBExistance(argv.db)
-            // this command is only supported in macos & gnu/linux
             checkForSupportedPlatform()
 
             init(argv.db)
