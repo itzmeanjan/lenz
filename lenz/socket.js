@@ -65,35 +65,17 @@ const awk_1 = data => new Promise((resolve, reject) => {
     })
 })
 
-// another pattern extractor using awk, where we try to
-// extract out only destination machine's address ( ipv4/ 6 )/ domain name
-// for each of active socket connections.
-const awk_2 = data => new Promise((resolve, reject) => {
-    let buffer
-    const awk = spawn('awk', ['-F', '->', '{ print $2 }'])
-
-    awk.stdout.on('data', d => {
-        buffer = d.toString()
-    })
-    awk.on('close', code => {
-        if (code !== 0) {
-            return reject(code)
-        }
-        return resolve(buffer)
-    })
-
-    awk.stdin.write(data, _ => {
-        awk.stdin.end()
-    })
-})
-
-// this function is capable of extracting out currently connected all TCP/ UDP
+// this function is capable of extracting out all currently connected TCP/ UDP
 // connection peer address/ domain names, along with respective application
 // which is using this connection for passing in/ out data
 //
 // this output to be used in console map, to provide a better live visualization
 // capability
-const getTCPAndUDPPeersX = _ => {
+//
+// this function is going to return a event stream, listen to `peers` event
+// where an array of currently connected peers to be returned
+// & consider updating consuming application as soon as new data comes in
+const getTCPAndUDPPeers = _ => {
     const watcher = _ => new Promise((resolve, reject) => {
         lsof().then(awk_0).then(awk_1).then(v =>
             resolve(v.split('\n')
@@ -126,44 +108,6 @@ const getTCPAndUDPPeersX = _ => {
     return stream
 }
 
-// extracts all tcp/ udp peer addresses ( ip address/ domain name/ sub-domain name )
-// to which this machine is currently talking to
-// and returns an array of them, which can be used for looking up
-// their respective location & then to be drawn on 
-// map [ which is our final objective i.e. visualization of connected socket peers on console map : lenz ]
-const getTCPAndUDPPeers = _ => {
-    const watcher = _ => new Promise((resolve, reject) => {
-        lsof().then(v => awk_0(v)
-            .then(v => awk_1(v)
-                .then(v => awk_2(v).then(v => resolve(
-                    v.split('\n').filter(v => v.length !== 0)
-                        .map(v => v.split(':').slice(0, -1).join(':').replace(/\[|\]/g, ''))
-                        .filter((v, i, a) => i === a.findIndex(t => t === v))
-                ))
-                    .catch(reject)).catch(reject))
-            .catch(reject)).catch(reject)
-    })
-
-    const stream = new EventEmitter()
-    // this async block keeps running watcher, which will
-    // keep querying system about what are tcp/ udp peers are connected to machine, currently
-    const worker = async (stream) => {
-        while (true) {
-            try {
-                const peers = await watcher()
-                stream.emit('peers', peers)
-            } catch (e) {
-                stream.emit('error', e)
-            }
-        }
-    }
-
-    // and here we invoke worker, which is going for one infinite iteration
-    worker(stream)
-    return stream
-}
-
 module.exports = {
-    getTCPAndUDPPeers,
-    getTCPAndUDPPeersX
+    getTCPAndUDPPeers
 }
