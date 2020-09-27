@@ -26,7 +26,7 @@ const lsof = _ => new Promise((resolve, reject) => {
 // fields of interest
 const awk_0 = data => new Promise((resolve, reject) => {
     let buffer
-    const awk = spawn('awk', ['{ print $9 }'])
+    const awk = spawn('awk', ['{ print $1, $9 }'])
 
     awk.stdout.on('data', d => {
         buffer = d.toString()
@@ -48,7 +48,7 @@ const awk_0 = data => new Promise((resolve, reject) => {
 // valid ip addresses either ipv4/ 6/ (sub-)domain names
 const awk_1 = data => new Promise((resolve, reject) => {
     let buffer
-    const awk = spawn('awk', ['/.*->/{ print $1 }'])
+    const awk = spawn('awk', ['/.*->.*/{ print $1, $2 }'])
 
     awk.stdout.on('data', d => {
         buffer = d.toString()
@@ -85,6 +85,12 @@ const awk_2 = data => new Promise((resolve, reject) => {
     awk.stdin.write(data, _ => {
         awk.stdin.end()
     })
+})
+
+const getTCPAndUDPPeersX = _ => new Promise((resolve, reject) => {
+    lsof().then(awk_0).then(awk_1).then(v => {
+        console.log(v.split('\n').filter(v => v.length !== 0))
+    }).catch(reject).catch(reject).catch(reject)
 })
 
 // extracts all tcp/ udp peer addresses ( ip address/ domain name/ sub-domain name )
@@ -125,5 +131,6 @@ const getTCPAndUDPPeers = _ => {
 }
 
 module.exports = {
-    getTCPAndUDPPeers
+    getTCPAndUDPPeers,
+    getTCPAndUDPPeersX
 }
