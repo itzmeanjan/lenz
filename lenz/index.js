@@ -460,12 +460,33 @@ const argv = require('yargs').scriptName('lenz'.magenta)
             // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
             screen.key(['escape', 'q', 'C-c'], (ch, key) => {
                 screen.destroy()
-                logger().then(v => {
-                    console.log(`${v}`.green)
-                    process.exit(0)
-                }).catch(e => {
-                    console.log(`${e}`.red)
-                    process.exit(1)
+
+                console.log('\n')
+                console.table(markers, ['app', 'ip', 'lon', 'lat', 'region', 'country'])
+                console.log('\n')
+
+                // dumping json output to dump file
+                // where we'll put all peers
+                // which were shown on map
+                writeFile(argv.dump, JSON.stringify({
+                    dump: markers.map(v => {
+                        return {
+                            app: v.app,
+                            ip: v.ip,
+                            lon: v.lon,
+                            lat: v.lat,
+                            region: v.region,
+                            country: v.country
+                        }
+                    })
+                }, null, '\t'), err => {
+                    if (err) {
+                        console.log('[~]Failed to dump'.red)
+                        process.exit(0)
+                    } else {
+                        console.log(`[+]Dumped into ${argv.dump}`.green)
+                        process.exit(1)
+                    }
                 })
             })
             // first screen render
