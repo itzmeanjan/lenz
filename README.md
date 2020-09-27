@@ -59,7 +59,7 @@ Please try to stick with that to avoid unexpected behaviours.
 We'll also need [IP2Location™ LITE IP-ASN Database](https://lite.ip2location.com/database/ip-asn) for using `la` command. See [below](#geo-locate-ipv4-addresses-owned-by-some-autonomous-system--la-).
   - Please use IPv4 version of ASN Database
 
-And we need to have NodeJS( >10.X ).
+And we need to have NodeJS( >=12.18.4 ).
 
 ## Installation
 
