@@ -2,8 +2,7 @@
 
 const blessed = require('blessed')
 const contrib = require('blessed-contrib')
-const magnet = require('magnet-uri')
-const { existsSync, writeFile } = require('fs')
+const { writeFile } = require('fs')
 const { isIP } = require('net')
 const dns = require('dns')
 const isValidDomain = require('is-valid-domain')
@@ -17,47 +16,8 @@ const { getMyIP } = require('./ip')
 const { init, lookup } = require('./locate')
 const { getHTML, extractCSSResources, extractScriptResources, extractImageResources, extractDomainNamesFromURLs, mergetTwoSets } = require('./resources')
 const { Worker } = require('worker_threads')
+const { checkMagnetLinkValidation, checkDBExistance, checkDomainNameValidation, validateLookup, checkIPAddressValidation } = require('./util')
 
-// validating user given torrent magnet link
-const checkMagnetLinkValidation = _magnet => {
-    const parsed = magnet(_magnet)
-    if (!parsed.infoHash) {
-        console.log('[!]Bad Torrent 🧲 Link'.red)
-        process.exit(1)
-    }
-
-    return parsed.infoHash
-}
-
-// checking existance of local ip2location db file {*.bin, *.csv}
-// if not present, exit process with return code 1
-const checkDBExistance = db => {
-    if (!existsSync(db)) {
-        console.log('[!]Can\'t find IP2Location Database'.red)
-        process.exit(1)
-    }
-}
-
-// checking whether supplied domain name is valid or not
-// if not, exit process with return code 1
-const checkDomainNameValidation = domain => {
-    if (!isValidDomain(domain)) {
-        console.log('[!]Invalid domain name'.red)
-        process.exit(1)
-    }
-}
-
-// validates looked up ip address info, because in case of
-// private ip addresses it'll return longitude & latitude fields as `0` & region & country as `-`
-const validateLookup = data => !(data.lon === 0 && data.lat === 0 && data.region === '-' && data.country === '-')
-
-// validates user provided IPv{4,6} address
-const checkIPAddressValidation = ip => {
-    if (!isIP(ip)) {
-        console.log('[!]Invalid IP Address'.red)
-        process.exit(1)
-    }
-}
 
 // add marker on map in specified location
 const addMarkerAndRender = (lon, lat, color, char, map, screen) => {
@@ -342,18 +302,53 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 console.log('Successful look up'.green)
             })
         })
+    // this command is only supported in darwin & gnu/linux
+    // due to the fact, it uses lsof & awk, these two unix utilities
     .command('ls <db> [dump]', 'Find location of connected TCP/UDP socket peer(s)',
         {
             db: { describe: 'path to ip2location-db5.bin', type: 'string' },
             dump: { describe: 'path to sink-file.json', type: 'string', default: 'dump.json' }
         }, argv => {
             checkDBExistance(argv.db)
-            // this command is only supported in macos & gnu/linux
             checkForSupportedPlatform()
 
             init(argv.db)
 
-            render((map, table, screen) => {
+            const screen = blessed.screen()
+            const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
+            const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Scanning ...', style: { shapeColor: 'cyan' } })
+            const table = grid.set(10, 0, 2, 1, contrib.table, {
+                keys: true
+                , vi: true
+                , fg: 'white'
+                , selectedFg: 'green'
+                , selectedBg: 'black'
+                , interactive: true
+                , label: 'TCP/ UDP Peer(s)'
+                , width: '100%'
+                , height: '95%'
+                , border: { type: "line", fg: "cyan" }
+                , columnSpacing: 10
+                , columnWidth: [20, 48, 10, 10, 40, 30]
+            })
+            table.focus()
+
+            getMyIP().then(ip => {
+                let resp = lookup(ip)
+                if (validateLookup(resp)) {
+                    // cached host machine IP
+                    markers.push({ ...resp, color: 'red', char: 'X', app: '-' })
+
+                    // putting this machine's location info onto table
+                    table.setData({
+                        headers: ['App', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
+                    })
+
+                    // adding this machine's location onto map
+                    addMarkerAndRender(resp.lon, resp.lat, 'red', 'X', map, screen)
+                }
+
                 // using this we can start listening to {peers, error} events
                 const listener = getTCPAndUDPPeers()
 
@@ -369,36 +364,36 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     }
 
                     v.forEach(v => {
-                        if (isIP(v)) {
-                            let resp = lookup(v)
+                        const record = v
+
+                        if (isIP(record[1])) {
+                            let resp = lookup(record[1])
                             if (validateLookup(resp)) {
                                 // cached remote machine IP
-                                markers.push({ ...resp, color: 'magenta', char: 'o' })
+                                markers.push({ ...resp, color: 'magenta', char: 'o', app: record[0] })
                                 // adding remote machine's location into map
                                 addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                             }
 
                             // putting peer location info onto table
                             table.setData({
-                                headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                data: markers
-                                    .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
-                                    .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                                headers: ['App', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                data: markers.map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
                             })
                         }
-                        else if (isValidDomain(v)) {
-                            domainToIP(v).then(v => {
+                        else if (isValidDomain(record[1])) {
+                            domainToIP(record[1]).then(v => {
 
                                 v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
                                     // cached remote machine IP
-                                    markers.push({ ...v, color: 'magenta', char: 'o' })
+                                    markers.push({ ...v, color: 'magenta', char: 'o', app: record[0] })
 
                                     // putting peer location info onto table
                                     table.setData({
-                                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                        headers: ['App', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
                                         data: markers
-                                            .filter((v, i, a) => i === a.findIndex(t => t.ip === v.ip))
-                                            .map(v => [v.ip, v.lon, v.lat, v.region, v.country])
+                                            .filter((v, i, a) => i === a.findIndex(t => t.app === v.app && t.ip === v.ip))
+                                            .map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
                                     })
 
                                     // adding remote machine's location into map
@@ -418,7 +413,45 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     console.log('[!]System scan failed'.red)
                     process.exit(1)
                 })
+
+                // flash every .5 seconds
+                setInterval(enableFlashEffect, 500, map, screen)
             })
+
+            // pressing {esc, q, ctrl+c}, results into exit with success i.e. return value 0
+            screen.key(['escape', 'q', 'C-c'], (ch, key) => {
+                screen.destroy()
+
+                console.log('\n')
+                console.table(markers, ['app', 'ip', 'lon', 'lat', 'region', 'country'])
+                console.log('\n')
+
+                // dumping json output to dump file
+                // where we'll put all peers
+                // which were shown on map
+                writeFile(argv.dump, JSON.stringify({
+                    dump: markers.map(v => {
+                        return {
+                            app: v.app,
+                            ip: v.ip,
+                            lon: v.lon,
+                            lat: v.lat,
+                            region: v.region,
+                            country: v.country
+                        }
+                    })
+                }, null, '\t'), err => {
+                    if (err) {
+                        console.log('[~]Failed to dump'.red)
+                        process.exit(0)
+                    } else {
+                        console.log(`[+]Dumped into ${argv.dump}`.green)
+                        process.exit(1)
+                    }
+                })
+            })
+            // first screen render
+            screen.render()
 
         })
     .command('lr <url> <db> [dump]', 'Locate static content delivery domain(s) used by URL',

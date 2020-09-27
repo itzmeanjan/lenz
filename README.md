@@ -36,9 +36,10 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 
 - Given (sub-)domain name, it can look up all associated server IPv4/6 addresses, showing them in console map 🥴
 - Given IPv4/6 address, can lookup it's location & show it in console map 🥳
-- Can find all active TCP/UDP socket connections & marks their respective peers in console map 🤩
+- Can find all currently active TCP/UDP socket connections & marks their respective peers in console map 🤩
+- This will be helpful in understanding which application is to talking to which machine & where is that located
 
-> Note: For 👆 operation, auto refresh has been enabled
+> Note: For 👆 operation, auto refresh has been enabled 🤩
 
 - Given torrent 🧲 link, can look up all peers associated with that infohash & show them in console map 🤓
 - Given any random URL, parses HTML & extracts out all static content i.e. {`*.js`, `*.css`, `image/*`} delivery domains & geo locate them 😎
