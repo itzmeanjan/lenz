@@ -355,7 +355,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
 
             const screen = blessed.screen()
             const grid = new contrib.grid({ rows: 12, cols: 1, screen: screen })
-            const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Searching ...', style: { shapeColor: 'cyan' } })
+            const map = grid.set(0, 0, 10, 1, contrib.map, { label: 'Scanning ...', style: { shapeColor: 'cyan' } })
             const table = grid.set(10, 0, 2, 1, contrib.table, {
                 keys: true
                 , vi: true
@@ -429,7 +429,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
 
                                     // putting peer location info onto table
                                     table.setData({
-                                        headers: ['Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                        headers: ['App', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
                                         data: markers.map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
                                     })
 
