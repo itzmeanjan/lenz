@@ -363,12 +363,12 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 , selectedFg: 'green'
                 , selectedBg: 'black'
                 , interactive: true
-                , label: 'Connected Peer(s)'
+                , label: 'TCP/ UDP Peer(s)'
                 , width: '100%'
                 , height: '95%'
                 , border: { type: "line", fg: "cyan" }
                 , columnSpacing: 10
-                , columnWidth: [16, 36, 10, 10, 40, 30]
+                , columnWidth: [20, 48, 10, 10, 40, 30]
             })
             table.focus()
 
@@ -430,7 +430,9 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                     // putting peer location info onto table
                                     table.setData({
                                         headers: ['App', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                        data: markers.map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
+                                        data: markers
+                                            .filter((v, i, a) => i === a.findIndex(t => t.app === v.app && t.ip === v.ip))
+                                            .map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
                                     })
 
                                     // adding remote machine's location into map
