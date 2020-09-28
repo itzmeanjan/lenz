@@ -26,7 +26,7 @@ const lsof = _ => new Promise((resolve, reject) => {
 // fields of interest
 const awk_0 = data => new Promise((resolve, reject) => {
     let buffer
-    const awk = spawn('awk', ['{ print $1, $9 }'])
+    const awk = spawn('awk', ['{ print $1, $2, $9 }'])
 
     awk.stdout.on('data', d => {
         buffer = d.toString()
@@ -48,7 +48,7 @@ const awk_0 = data => new Promise((resolve, reject) => {
 // valid ip addresses either ipv4/ 6/ (sub-)domain names
 const awk_1 = data => new Promise((resolve, reject) => {
     let buffer
-    const awk = spawn('awk', ['/.*->.*/{ print $1, $2 }'])
+    const awk = spawn('awk', ['/.*->.*/{ print $0 }'])
 
     awk.stdout.on('data', d => {
         buffer = d.toString()
@@ -83,9 +83,10 @@ const getTCPAndUDPPeers = _ => {
                 .map(v => v.split(' '))
                 .map(v => [
                     v[0],
-                    v[1].replace(/.*->/, '').split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')
+                    parseInt(v[1], 10),
+                    v[2].replace(/.*->/, '').split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')
                 ])
-                .filter((v, i, a) => i === a.findIndex(t => t[0] === v[0] && t[1] === v[1]))))
+                .filter((v, i, a) => i === a.findIndex(t => t[1] === v[1] && t[2] === v[2]))))
             .catch(reject).catch(reject).catch(reject)
     })
 
