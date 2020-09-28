@@ -26,7 +26,7 @@ const lsof = _ => new Promise((resolve, reject) => {
 // fields of interest
 const awk_0 = data => new Promise((resolve, reject) => {
     let buffer
-    const awk = spawn('awk', ['{ print $1, $9 }'])
+    const awk = spawn('awk', ['{ print $1, $2, $9 }'])
 
     awk.stdout.on('data', d => {
         buffer = d.toString()
