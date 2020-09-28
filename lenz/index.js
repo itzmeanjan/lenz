@@ -329,7 +329,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 , height: '95%'
                 , border: { type: "line", fg: "cyan" }
                 , columnSpacing: 10
-                , columnWidth: [20, 48, 10, 10, 40, 30]
+                , columnWidth: [20, 12, 48, 10, 10, 40, 30]
             })
             table.focus()
 
@@ -337,12 +337,12 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 let resp = lookup(ip)
                 if (validateLookup(resp)) {
                     // cached host machine IP
-                    markers.push({ ...resp, color: 'red', char: 'X', app: '-' })
+                    markers.push({ ...resp, color: 'red', char: 'X', app: '-', pid: NaN })
 
                     // putting this machine's location info onto table
                     table.setData({
-                        headers: ['App', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                        data: markers.map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
+                        headers: ['App', 'PID', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                        data: markers.map(v => [v.app, v.pid, v.ip, v.lon, v.lat, v.region, v.country])
                     })
 
                     // adding this machine's location onto map
