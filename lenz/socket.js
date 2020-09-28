@@ -83,9 +83,10 @@ const getTCPAndUDPPeers = _ => {
                 .map(v => v.split(' '))
                 .map(v => [
                     v[0],
-                    v[1].replace(/.*->/, '').split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')
+                    v[1],
+                    v[2].replace(/.*->/, '').split(':').slice(0, -1).join(':').replace(/\[|\]/g, '')
                 ])
-                .filter((v, i, a) => i === a.findIndex(t => t[0] === v[0] && t[1] === v[1]))))
+                .filter((v, i, a) => i === a.findIndex(t => t[1] === v[1] && t[2] === v[2]))))
             .catch(reject).catch(reject).catch(reject)
     })
 
