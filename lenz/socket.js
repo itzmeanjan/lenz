@@ -48,7 +48,7 @@ const awk_0 = data => new Promise((resolve, reject) => {
 // valid ip addresses either ipv4/ 6/ (sub-)domain names
 const awk_1 = data => new Promise((resolve, reject) => {
     let buffer
-    const awk = spawn('awk', ['/.*->.*/{ print $1, $2 }'])
+    const awk = spawn('awk', ['/.*->.*/{ print $0 }'])
 
     awk.stdout.on('data', d => {
         buffer = d.toString()
