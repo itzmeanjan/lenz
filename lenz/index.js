@@ -392,7 +392,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                                     table.setData({
                                         headers: ['App', 'PID', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
                                         data: markers
-                                            .filter((v, i, a) => i === a.findIndex(t => t.app === v.app && t.ip === v.ip))
+                                            .filter((v, i, a) => i === a.findIndex(t => t.pid === v.pid && t.ip === v.ip))
                                             .map(v => [v.app, v.pid, v.ip, v.lon, v.lat, v.region, v.country])
                                     })
 
