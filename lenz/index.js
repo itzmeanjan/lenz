@@ -423,7 +423,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                 screen.destroy()
 
                 console.log('\n')
-                console.table(markers, ['app', 'ip', 'lon', 'lat', 'region', 'country'])
+                console.table(markers, ['app', 'pid', 'ip', 'lon', 'lat', 'region', 'country'])
                 console.log('\n')
 
                 // dumping json output to dump file
@@ -433,6 +433,7 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     dump: markers.map(v => {
                         return {
                             app: v.app,
+                            pid: v.pid,
                             ip: v.ip,
                             lon: v.lon,
                             lat: v.lat,
