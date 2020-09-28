@@ -366,34 +366,34 @@ const argv = require('yargs').scriptName('lenz'.magenta)
                     v.forEach(v => {
                         const record = v
 
-                        if (isIP(record[1])) {
-                            let resp = lookup(record[1])
+                        if (isIP(record[2])) {
+                            let resp = lookup(record[2])
                             if (validateLookup(resp)) {
                                 // cached remote machine IP
-                                markers.push({ ...resp, color: 'magenta', char: 'o', app: record[0] })
+                                markers.push({ ...resp, color: 'magenta', char: 'o', app: record[0], pid: record[1] })
                                 // adding remote machine's location into map
                                 addMarkerAndRender(resp.lon, resp.lat, 'magenta', 'o', map, screen)
                             }
 
                             // putting peer location info onto table
                             table.setData({
-                                headers: ['App', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
-                                data: markers.map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
+                                headers: ['App', 'PID', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                data: markers.map(v => [v.app, v.pid, v.ip, v.lon, v.lat, v.region, v.country])
                             })
                         }
-                        else if (isValidDomain(record[1])) {
-                            domainToIP(record[1]).then(v => {
+                        else if (isValidDomain(record[2])) {
+                            domainToIP(record[2]).then(v => {
 
                                 v.map(v => lookup(v)).filter(validateLookup).forEach(v => {
                                     // cached remote machine IP
-                                    markers.push({ ...v, color: 'magenta', char: 'o', app: record[0] })
+                                    markers.push({ ...v, color: 'magenta', char: 'o', app: record[0], pid: record[1] })
 
                                     // putting peer location info onto table
                                     table.setData({
-                                        headers: ['App', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
+                                        headers: ['App', 'PID', 'Address', 'Longitude', 'Latitude', 'Region', 'Country'],
                                         data: markers
                                             .filter((v, i, a) => i === a.findIndex(t => t.app === v.app && t.ip === v.ip))
-                                            .map(v => [v.app, v.ip, v.lon, v.lat, v.region, v.country])
+                                            .map(v => [v.app, v.pid, v.ip, v.lon, v.lat, v.region, v.country])
                                     })
 
                                     // adding remote machine's location into map
