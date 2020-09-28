@@ -36,8 +36,8 @@ I interested in extending its functionalites in coming days, if you find I'm mis
 
 - Given (sub-)domain name, it can look up all associated server IPv4/6 addresses, showing them in console map 🥴
 - Given IPv4/6 address, can lookup it's location & show it in console map 🥳
-- Can find all currently active TCP/UDP socket connections & marks their respective peers in console map 🤩
-- This will be helpful in understanding which application is to talking to which machine & where is that located
+- Can find all currently active TCP/UDP socket connections from all processes & marks their respective peers in console map 🤩
+- This will be helpful in understanding which application _( using PID )_ is to talking to which machine & where is that located
 
 > Note: For 👆 operation, auto refresh has been enabled 🤩
 

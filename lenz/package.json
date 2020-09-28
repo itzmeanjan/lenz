@@ -1,6 +1,6 @@
 {
   "name": "lenz",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Console based MAP 🗺, with lots of features packed in 😎",
   "main": "index.js",
   "bin": {
