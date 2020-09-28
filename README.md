@@ -209,6 +209,16 @@ Options:
 Not enough non-option arguments: got 0, need at least 1
 ```
 
+---
+
+**Newest Addition**
+
+Which process is talking to which remote machine, can now be figured out easily & if required they can be killed using *nix utilities
+
+![sc](sc/sc_1.png)
+
+---
+
 ### Locate static content delivery domains used in a webpage ( lr )
 
 Given any webpage URL, parses out its `script`, `link` & `img` tags, which are used for including static resources into HTML i.e. CSS, JS & images. If they are delivered from some domain other than this one, extract them out & then resolve those domain names into IPv4/6 addresses, which are to be geolocated using IP2Location DB5 database. They are also shown on console map.
