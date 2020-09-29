@@ -120,6 +120,8 @@ Not enough non-option arguments: got 0, need at least 1
 
 > Please use tool's help option for getting more info related to supported commands.
 
+---
+
 ### Show peers by magnet link ( lm )
 
 Get a magnet link & supply it while invoking `lenz`
@@ -140,6 +142,8 @@ Options:
 
 Not enough non-option arguments: got 0, need at least 2
 ```
+
+---
 
 ### Look up by domain name ( ld )
 
@@ -162,6 +166,8 @@ Options:
 Not enough non-option arguments: got 0, need at least 2
 ```
 
+---
+
 ### Look up by ip address ( lp )
 
 Looks up IPv _{4,6}_  address location & shows on console map.
@@ -182,6 +188,8 @@ Options:
 
 Not enough non-option arguments: got 0, need at least 2
 ```
+
+---
 
 ### Find all active TCP/UDP sockets ( ls )
 
@@ -215,6 +223,8 @@ Not enough non-option arguments: got 0, need at least 1
 
 Which process is talking to which remote machine, can now be figured out easily & if required they can be killed using *nix utilities
 
+> Note: Host machine PID to be displayed as NaN
+
 ![sc](sc/sc_1.png)
 
 ---
@@ -241,6 +251,8 @@ Options:
 
 Not enough non-option arguments: got 0, need at least 2
 ```
+
+---
 
 ### Geo Locate IPv4 addresses owned by some Autonomous System ( la )
 
@@ -269,6 +281,8 @@ Options:
 
 Not enough non-option arguments: got 0, need at least 3
 ```
+
+---
 
 ## Contribution
 
